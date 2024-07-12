@@ -1,0 +1,6 @@
+openai
+requests
+newrelic
+flask
+Image
+urllib3
