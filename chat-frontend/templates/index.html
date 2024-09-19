@@ -23,7 +23,8 @@
       <input type="submit" value="Get games">{% if outputGames %}
         <label for="outputGames">Output:</label>
         {% for game in outputGames %}<div><a onclick='javascript:enterGame(this);'>{{game}}</a></div>{% endfor %}
-      </nobr>{% endif %}
+      {% endif %}
+    </nobr>
   </form>
   <form action="/activities/search" method="POST">
     <label for="input">Input:</label>
