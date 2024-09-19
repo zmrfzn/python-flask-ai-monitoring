@@ -19,8 +19,29 @@ def home():
 @app.route("/activities", methods=["GET"])
 def activities():
     response = requests.get(url="http://127.0.0.1:8081/activities")
-    session['games'] = response.text
-    return render_template("index.html", outputGames=response.text)
+    #gamesList = response.text
+    #transform response.text json array to a list of anker tags
+    games = json.loads(response.text)
+    gamesList = []
+    print(games)
+    for game in games:
+        print(game)
+        # url encode the game name
+        encoded_game = urllib.parse.quote(game)
+        print(encoded_game)
+
+        #game = urllib..urlencode(game)
+        gamesList.append(game)
+        #gamesList += "<a href='/activities/search?activity="+encoded_game+"'>"+game+"</a>"
+
+    # convert gamesList to html and store in session
+
+    # convert gamesList string to array
+    #gamesList = gamesList.split(",")
+    session['games'] = gamesList
+    return render_template("index.html", outputGames=gamesList)
+
+    #return render_template("index.html", outputGames=response.text)
 
 @app.route("/activities/search", methods=["POST"])
 def activitiesSearch():
@@ -29,9 +50,10 @@ def activitiesSearch():
     print(activity)
     response = requests.get(url="http://127.0.0.1:8081/activities/search?activity="+activity)
     json_object = json.loads(response.text)
+    outputGames = session['games']
     session['gameInput'] = input_prompt
     session['gamePrompt'] = json_object["prompt"]
-    return render_template("index.html", outputGamePrompt=json_object["prompt"], outputGames=input_prompt)
+    return render_template("index.html", outputGamePrompt=json_object["prompt"], outputGames=outputGames, input_prompt=input_prompt)
 
 @app.route("/chat", methods=["POST"])
 def chat():
@@ -44,8 +66,10 @@ def chat():
     chatGuid = json_object["guid"]
     session['chatGuid'] = chatGuid
     chatContent = json_object["messages"][1]["content"]
+    game = session['gameInput']
+    outputGames = session['games']
     session['chatContent'] = chatContent
-    return render_template("index.html", outputChatGuid=chatGuid, outputChatContent=chatContent, outputGamePrompt=input_prompt)
+    return render_template("index.html", outputChatGuid=chatGuid, outputChatContent=chatContent, outputGamePrompt=input_prompt, outputGames=outputGames, input_prompt=game)
 
 @app.route("/chat/guid", methods=["POST"])
 def chatGuid():
@@ -60,10 +84,12 @@ def chatGuid():
     print(json_object)
     msgLength = len(json_object["messages"])
     chatInteractionResult = json_object["messages"][msgLength-1]["content"]
+    outputGames = session['games']
+    input_prompt = session['gameInput']
     chatContent = session['chatContent']
     gameInput = session['gameInput']
     gamePrompt = session['gamePrompt']
-    return render_template("index.html", outputChatInteraction=chatInteractionResult, outputChatGuid=chatGuid, outputChatContent=chatContent, outputGamePrompt=gamePrompt, outputGames=gameInput)
+    return render_template("index.html", outputChatInteraction=chatInteractionResult, outputChatGuid=chatGuid, outputChatContent=chatContent, outputGamePrompt=gamePrompt, outputGames=outputGames, input_prompt=input_prompt)
 
 # make the server publicly available via port 5004
 # flask --app chat-ui.py run --host 0.0.0.0 --port 5004
