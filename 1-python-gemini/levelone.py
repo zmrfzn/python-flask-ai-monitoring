@@ -4,12 +4,17 @@ import google.generativeai as genai
 
 genai.configure(api_key=os.environ["API_KEY"])
 
+#GEMINI_MODEL = "gemini-1.5-flash"
+GEMINI_MODEL = "gemini-1.5-flash-8b"
+#GEMINI_MODEL = "gemini-1.5-pro"
+#GEMINI_MODEL = "gemini-1.0-pro"
+
 app = Flask(__name__)
 
 ## taking the input from the user and returning the response from Gemini
 
 def chatCompletion(prompt):
-    model = genai.GenerativeModel("gemini-1.5-flash")
+    model = genai.GenerativeModel(GEMINI_MODEL)
     response = model.generate_content(
         prompt,
         generation_config=genai.types.GenerationConfig(
