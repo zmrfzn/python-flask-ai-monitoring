@@ -12,14 +12,6 @@ app = Flask(__name__)
 newrelic.agent.initialize('newrelic.ini')
 
 def chatCompletion(prompt):
-    # completion = client.chat.completions.create(
-    #     model="gpt-3.5-turbo",
-    #     temperature=0.8,
-    #     max_tokens=256,
-    #     messages=[
-    #         {"role": "user", "content": prompt}
-    #     ])
-    # return completion.choices[0].message.content
     model = genai.GenerativeModel("gemini-1.5-flash")
     response = model.generate_content(
         prompt,
