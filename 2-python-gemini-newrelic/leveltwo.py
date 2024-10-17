@@ -24,7 +24,12 @@ def chatCompletion(prompt):
             temperature=1.0,
         ),
     )
-    return response.candidates[0].content.parts[0].text
+    responseText = ""
+    if response.candidates:
+        if response.candidates[0].content.parts:
+            if response.candidates[0].content.parts[0].text:
+                responseText = response.candidates[0].content.parts[0].text
+    return responseText
 
 @app.route("/")
 def home():
