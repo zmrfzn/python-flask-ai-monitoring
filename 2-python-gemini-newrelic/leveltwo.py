@@ -16,6 +16,7 @@ app = Flask(__name__)
 # initialize the New Relic Python agent
 newrelic.agent.initialize('newrelic.ini')
 
+## taking the input from the user and returning the response from Gemini
 def chatCompletion(prompt):
     model = genai.GenerativeModel(GEMINI_MODEL)
     response = model.generate_content(
