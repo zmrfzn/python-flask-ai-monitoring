@@ -13,6 +13,7 @@ app = Flask(__name__)
 # taking the input from the user and returning the response from OpenAI
 
 def chatCompletion(prompt):
+    print("prompt: "&prompt)
     completion = client.chat.completions.create(
         model="gpt-3.5-turbo",
         temperature=0.8,

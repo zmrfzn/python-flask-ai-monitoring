@@ -12,7 +12,6 @@ GEMINI_MODEL = "gemini-1.5-flash"
 app = Flask(__name__)
 
 ## taking the input from the user and returning the response from Gemini
-
 def chatCompletion(prompt):
     model = genai.GenerativeModel(GEMINI_MODEL)
     response = model.generate_content(

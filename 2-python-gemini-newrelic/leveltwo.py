@@ -18,6 +18,7 @@ newrelic.agent.initialize('newrelic.ini')
 
 ## taking the input from the user and returning the response from Gemini
 def chatCompletion(prompt):
+    print("prompt: "+prompt)
     model = genai.GenerativeModel(GEMINI_MODEL)
     response = model.generate_content(
         prompt,

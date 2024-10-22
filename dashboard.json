@@ -28,7 +28,7 @@
                                 "accountIds": [
                                     NEW_RELIC_ACCOUNT_ID
                                 ],
-                                "query": "FROM lookup(AIModelCost) select latest(`cost-input`)/100 as '$ Input/1M tokens', latest(`cost-output`)/100 as '$ output/1M tokens' facet vendor,response.model "
+                                "query": "FROM lookup(AIModelCost) select latest(`cost-input`) as '$ Input/1M tokens', latest(`cost-output`) as '$ output/1M tokens' facet vendor,response.model "
                             }
                         ],
                         "platformOptions": {
