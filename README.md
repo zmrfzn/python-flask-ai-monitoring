@@ -61,3 +61,19 @@ export OPENAI_API_KEY=YOUR_API_KEY_HERE
 
 NEW_RELIC_CONFIG_FILE=newrelic.ini newrelic-admin run-program flask --app levelthree.py run --host 0.0.0.0 --port 5004
 ```
+
+---
+
+### **Cost Dashboard**
+
+A nice feature of the New Relic platform is the capability to add lookup tables as part of the Logs section. In this case, I created a lookup table that includes the actual [OpenAI](https://openai.com/api/pricing/) and [Gemini](https://ai.google.dev/pricing) cost of running the different AI models. I created a [CSV file](./lookup-table-model-cost.csv) as part of the GitHub repository that you can use to import into your New Relic account as a [Lookup table](https://docs.newrelic.com/docs/nrql/using-nrql/lookups/).
+
+![lookup table](./lookup-table.png)
+
+This lookup table basically represents some static information that you then can use to reference for example in custom dashboards. I also provided an [example dashboard](./dashboard.json) that leverages that lookup table and joins it with the AI monitoring data that we collected. You can use the JSON representation of the dashboard and import it into your New Relic account as well.
+
+**Note**: Please update all of the placeholders that reference NEW_RELIC_ACCOUNT_ID in JSON with your actual New Relic account ID.
+
+Once you imported the dashboard, you can then look at a similar result as shown below. The dashboard takes the actual tokens used throughout your interaction with the chat service and multiplies it with the data from the OpenAI cost lookup table.
+
+![ai cost dashboard](./ai-cost-dashboard.png)
