@@ -1,0 +1,74 @@
+[
+    {
+        "eventType": "LLMAIMModelCost",
+        "response.model": "gpt-3.5-turbo-0125",
+        "cost-input": 0.50,
+        "cost-input-tokens": 1000000,
+        "cost-output": 1.50,
+        "cost-output-tokens": 1000000,
+        "vendor": "OpenAI"
+    },
+    {
+        "eventType": "LLMAIMModelCost",
+        "response.model": "gpt-4-turbo-2024-04-09",
+        "cost-input": 10,
+        "cost-input-tokens": 1000000,
+        "cost-output": 30,
+        "cost-output-tokens": 1000000,
+        "vendor": "OpenAI"
+    },
+    {
+        "eventType": "LLMAIMModelCost",
+        "response.model": "gpt-4o-2024-05-13",
+        "cost-input": 5,
+        "cost-input-tokens": 1000000,
+        "cost-output": 15,
+        "cost-output-tokens": 1000000,
+        "vendor": "OpenAI"
+    },
+    {
+        "eventType": "LLMAIMModelCost",
+        "response.model": "gpt-4o",
+        "cost-input": 2.50,
+        "cost-input-tokens": 1000000,
+        "cost-output": 10,
+        "cost-output-tokens": 1000000,
+        "vendor": "OpenAI"
+    },
+    {
+        "eventType": "LLMAIMModelCost",
+        "response.model": "gemini-1.5-flash",
+        "cost-input": 0.075,
+        "cost-input-tokens": 1000000,
+        "cost-output": 0.30,
+        "cost-output-tokens": 1000000,
+        "vendor": "Gemini"
+    },
+    {
+        "eventType": "LLMAIMModelCost",
+        "response.model": "gemini-1.5-flash-8b",
+        "cost-input": 0.0375,
+        "cost-input-tokens": 1000000,
+        "cost-output": 0.15,
+        "cost-output-tokens": 1000000,
+        "vendor": "Gemini"
+    },
+    {
+        "eventType": "LLMAIMModelCost",
+        "response.model": "gemini-1.5-pro",
+        "cost-input": 1.25,
+        "cost-input-tokens": 1000000,
+        "cost-output": 5.00,
+        "cost-output-tokens": 1000000,
+        "vendor": "Gemini"
+    },
+    {
+        "eventType": "LLMAIMModelCost",
+        "response.model": "gemini-1.0-pro",
+        "cost-input": 0.50,
+        "cost-input-tokens": 1000000,
+        "cost-output": 1.50,
+        "cost-output-tokens": 1000000,
+        "vendor": "Gemini"
+    }
+]
