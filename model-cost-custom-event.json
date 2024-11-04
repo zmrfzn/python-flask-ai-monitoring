@@ -37,6 +37,15 @@
     },
     {
         "eventType": "LLMAIMModelCost",
+        "response.model": "gpt-4o-2024-08-06",
+        "cost-input": 2.50,
+        "cost-input-tokens": 1000000,
+        "cost-output": 10,
+        "cost-output-tokens": 1000000,
+        "vendor": "OpenAI"
+    },
+    {
+        "eventType": "LLMAIMModelCost",
         "response.model": "gemini-1.5-flash",
         "cost-input": 0.075,
         "cost-input-tokens": 1000000,
