@@ -79,5 +79,50 @@
         "cost-output": 1.50,
         "cost-output-tokens": 1000000,
         "vendor": "Gemini"
+    },
+    {
+        "eventType": "LLMAIMModelCost",
+        "response.model": "amazon.titan-text-lite-v1",
+        "cost-input": 0.00015,
+        "cost-input-tokens": 1000,
+        "cost-output": 0.0002,
+        "cost-output-tokens": 1000,
+        "vendor": "Amazon Bedrock"
+    },
+    {
+        "eventType": "LLMAIMModelCost",
+        "response.model": "anthropic.claude-3-haiku-20240307-v1:0",
+        "cost-input": 0.00025,
+        "cost-input-tokens": 1000,
+        "cost-output": 0.00125,
+        "cost-output-tokens": 1000,
+        "vendor": "Amazon Bedrock"
+    },
+    {
+        "eventType": "LLMAIMModelCost",
+        "response.model": "anthropic.claude-v2:1",
+        "cost-input": 0.008,
+        "cost-input-tokens": 1000,
+        "cost-output": 0.024,
+        "cost-output-tokens": 1000,
+        "vendor": "Amazon Bedrock"
+    },
+    {
+        "eventType": "LLMAIMModelCost",
+        "response.model": "anthropic.claude-v2",
+        "cost-input": 0.008,
+        "cost-input-tokens": 1000,
+        "cost-output": 0.024,
+        "cost-output-tokens": 1000,
+        "vendor": "Amazon Bedrock"
+    },
+    {
+        "eventType": "LLMAIMModelCost",
+        "response.model": "anthropic.claude-3-5-sonnet-20240620-v1:0",
+        "cost-input": 0.003,
+        "cost-input-tokens": 1000,
+        "cost-output": 0.015,
+        "cost-output-tokens": 1000,
+        "vendor": "Amazon Bedrock"
     }
 ]
