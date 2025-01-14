@@ -1,8 +1,10 @@
-# import the New Relic Python Agent
-import newrelic.agent
+from traceloop.sdk import Traceloop
+
 import os
 from flask import Flask, render_template, request
 import google.generativeai as genai
+
+Traceloop.init(disable_batch=True)
 
 genai.configure(api_key=os.environ["API_KEY"])
 
@@ -12,9 +14,6 @@ GEMINI_MODEL = "gemini-1.5-flash"
 #GEMINI_MODEL = "gemini-1.0-pro"
 
 app = Flask(__name__)
-
-# initialize the New Relic Python agent
-newrelic.agent.initialize('newrelic.ini')
 
 ## taking the input from the user and returning the response from Gemini
 def chatCompletion(prompt):
