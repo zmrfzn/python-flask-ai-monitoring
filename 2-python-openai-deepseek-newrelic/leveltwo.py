@@ -72,9 +72,9 @@ def t(environ, start_response):
 if __name__ == '__main__':
     app.run(host="0.0.0.0", debug=True, port=5004)
 
-httpd = make_server('localhost',9001,app,handler_class=WebSocketHandler)
-print('WSGIServer: Serving HTTP on port 9001 ...\n')
-try:
-    httpd.serve_forever()
-except:
-    print('WSGIServer: Server Stopped')
+    httpd = make_server('localhost',9001,app,handler_class=WebSocketHandler)
+    print('WSGIServer: Serving HTTP on port 9001 ...\n')
+    try:
+        httpd.serve_forever()
+    except:
+        print('WSGIServer: Server Stopped')
