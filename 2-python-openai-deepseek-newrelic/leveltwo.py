@@ -3,8 +3,8 @@ import newrelic.agent
 import os
 from openai import OpenAI
 from flask import Flask, render_template, request
-from signalpy import *
-import signalpy.jslib
+from wsocket import WebSocketHandler, WebSocketError
+from wsgiref.simple_server import make_server
 
 client = OpenAI(
     # This is the default and can be omitted
@@ -34,6 +34,22 @@ def chatCompletion(prompt):
         responseContent += chunk.choices[0].delta.content
     return responseContent
 
+@app.route('/')
+def handle_websocket():
+    wsock = request.environ.get('wsgi.websocket')
+    if not wsock:
+        return 'Hello World!'
+
+    while True:
+        try:
+            message = wsock.receive()
+            print(message)
+            wsock.send('Your message was: %r' % message)
+            sleep(3)
+            wsock.send('Your message was: %r' % message)
+        except WebSocketError:
+            break
+
 @app.route("/")
 def home():
     return render_template("index.html")
@@ -48,10 +64,17 @@ def prompt():
 def t(environ, start_response):
     status = '200 OK'
     response_headers = []
-    start_response(status, response_headers)
+    #start_response(status, response_headers)
     return[signalpy.jslib.data.encode()]
 
 # make the server publicly available via port 5004
 # flask --app levelsix.py run --host 0.0.0.0 --port 5004
 if __name__ == '__main__':
     app.run(host="0.0.0.0", debug=True, port=5004)
+
+httpd = make_server('localhost',9001,app,handler_class=WebSocketHandler)
+print('WSGIServer: Serving HTTP on port 9001 ...\n')
+try:
+    httpd.serve_forever()
+except:
+    print('WSGIServer: Server Stopped')
