@@ -1,5 +1,4 @@
 flask
-signalpy
 newrelic
 openai
 wsocket

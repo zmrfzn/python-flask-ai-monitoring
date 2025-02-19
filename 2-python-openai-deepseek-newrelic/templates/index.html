@@ -1,28 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/milligram.css') }}">
-  <script src="/signalpy.js"></script>
-  <title>My AI Bot</title>
+  <script type="text/javascript">
+    var ws = new WebSocket("wss://localhost:8080");
+    ws.onopen = function() {
+        ws.send("Hello, world");
+    };
+    ws.onmessage = function (evt) {
+        //alert(evt.data);
+        document.getElementById("content").innerHTML = evt.data;
+    };
+  </script>
 </head>
 <body>
-  <script>
-    var sock = SignalPy('localhost:9001/py');
-    sock.onmessage=function(data) {console.log(data);sock.send(data.data);};
-  </script>
-  <h3>My AI Bot</h3>
-  <form action="/prompt" method="POST">
-    <label for="input">Input:</label>
-    <!-- switching to textarea for wider input -->
-    <textarea placeholder="Insert Your Prompt" name="input"></textarea>
-    <input type="submit" value="Submit">
-  </form>
-    {% if output %}
-    <label for="output">Output:</label>
-    <p>{{ output }}</p>
-    {% endif %}
+  <div id="content"></div>
 </body>
 </html>

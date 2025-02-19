@@ -60,21 +60,7 @@ def prompt():
     output_prompt = chatCompletion(input_prompt)
     return render_template("index.html", output=output_prompt)
 
-@app.route('/signalpy.js')
-def t(environ, start_response):
-    status = '200 OK'
-    response_headers = []
-    #start_response(status, response_headers)
-    return[signalpy.jslib.data.encode()]
-
 # make the server publicly available via port 5004
 # flask --app levelsix.py run --host 0.0.0.0 --port 5004
 if __name__ == '__main__':
     app.run(host="0.0.0.0", debug=True, port=5004)
-
-    httpd = make_server('localhost',9001,app,handler_class=WebSocketHandler)
-    print('WSGIServer: Serving HTTP on port 9001 ...\n')
-    try:
-        httpd.serve_forever()
-    except:
-        print('WSGIServer: Server Stopped')
