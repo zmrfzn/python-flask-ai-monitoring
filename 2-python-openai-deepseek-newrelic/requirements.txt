@@ -3,3 +3,4 @@ newrelic
 openai
 wsocket
 bottle
+cherrypy
