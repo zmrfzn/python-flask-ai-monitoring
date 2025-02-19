@@ -52,21 +52,26 @@ def chatCompletion(prompt):
 
 class ChatWebSocketHandler(WebSocket):
     def received_message(self, m):
-        completion = client.chat.completions.create(
-            model="deepseek-r1:latest",
-            messages=[
-                {"role": "user", "content": m}
-            ],
-            stream=True)
+        mData = str(m.data.decode("utf-8"))
+        if ("entered the room" in mData):
+            cherrypy.engine.publish('websocket-broadcast', m)
+        else:
+            print(mData)
+            completion = client.chat.completions.create(
+                model="deepseek-r1:latest",
+                messages=[
+                    {"role": "user", "content": mData}
+                ],
+                stream=True)
 
-        chunks = []
-        responseContent = ""
-        for chunk in completion:
-            chunkContent = chunk.choices[0].delta.content
-            chunks.append(chunk)
-            print(chunkContent)
-            responseContent += chunkContent
-            cherrypy.engine.publish('websocket-broadcast', chunkContent)
+            chunks = []
+            responseContent = ""
+            for chunk in completion:
+                chunkContent = chunk.choices[0].delta.content
+                chunks.append(chunk)
+                print(chunkContent)
+                responseContent += chunkContent
+                cherrypy.engine.publish('websocket-broadcast', chunkContent.replace("\n", "").replace("\r", ""))
 
     def closed(self, code, reason="A client left the room without a proper explanation."):
         cherrypy.engine.publish('websocket-broadcast', TextMessage(reason))

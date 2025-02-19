@@ -46,7 +46,8 @@
 
             $("#send").click(function () {
                 console.log($("#message").val());
-                ws.send("%(username)s: " + $("#message").val());
+                //ws.send("%(username)s: " + $("#message").val());
+                ws.send($("#message").val());
                 $("#message").val("");
                 return false;
             });
@@ -57,7 +58,7 @@
 <body>
     <div class="container">
         <div class="row">
-            <textarea id="chat" readonly="readonly"></textarea>
+            <textarea id="chat" readonly="readonly" wrap></textarea>
         </div>
 
         <div class="row">
