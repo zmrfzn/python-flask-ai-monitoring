@@ -34,22 +34,6 @@ def chatCompletion(prompt):
         responseContent += chunk.choices[0].delta.content
     return responseContent
 
-@app.route('/')
-def handle_websocket():
-    wsock = request.environ.get('wsgi.websocket')
-    if not wsock:
-        return 'Hello World!'
-
-    while True:
-        try:
-            message = wsock.receive()
-            print(message)
-            wsock.send('Your message was: %r' % message)
-            sleep(3)
-            wsock.send('Your message was: %r' % message)
-        except WebSocketError:
-            break
-
 @app.route("/")
 def home():
     return render_template("index.html")

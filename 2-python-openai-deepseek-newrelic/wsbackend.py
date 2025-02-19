@@ -2,10 +2,13 @@
 import newrelic.agent
 import os
 from bottle import request, Bottle
-from wsocket import WebSocketHandler, WebSocketError
+from wsocket import WebSocketHandler, WSocketApp, WebSocketError, logger, run
 from wsgiref.simple_server import make_server
+from time import sleep
 
-app = Bottle()
+logger.setLevel('DEBUG')
+
+bottle = Bottle()
 
 def redirect_http_to_https(callback):
     '''Bottle plugin that redirects all http requests to https'''
@@ -20,14 +23,18 @@ def redirect_http_to_https(callback):
             return callback(*args, **kwargs)
     return wrapper
 
-app.install(redirect_http_to_https)
+bottle.install(redirect_http_to_https)
 
-@app.route('/')
+app = WSocketApp(bottle)
+
+@bottle.route('/')
 def handle_websocket():
     wsock = request.environ.get('wsgi.websocket')
     if not wsock:
+        logger.info('No websocket')
         return 'Hello World!'
 
+    logger.info('Websocket connected')
     while True:
         try:
             message = wsock.receive()
@@ -38,9 +45,4 @@ def handle_websocket():
         except WebSocketError:
             break
 
-httpd = make_server('localhost',8080,app,handler_class=WebSocketHandler)
-print('WSGIServer: Serving HTTP on port 8080 ...\n')
-try:
-    httpd.serve_forever()
-except:
-    print('WSGIServer: Server Stopped')
+run(app)

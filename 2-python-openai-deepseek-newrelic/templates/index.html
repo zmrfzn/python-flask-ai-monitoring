@@ -1,18 +1,25 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <script type="text/javascript">
-    var ws = new WebSocket("wss://localhost:8080");
+
+</head>
+<body>
+    <script type="text/javascript">
+    var ws = new WebSocket("ws://localhost:8080");
+    console.log("WebSocket is opened");
     ws.onopen = function() {
-        ws.send("Hello, world");
+        console.log("WebSocket is opened with " + ws.protocol + " protocol");
+        ws.send("Hello, world from Harry");
     };
     ws.onmessage = function (evt) {
         //alert(evt.data);
+        console.log(messageEvent.data);
         document.getElementById("content").innerHTML = evt.data;
     };
+    ws.onclose = function(closeEvent) {
+        console.log("WebSocket is closed");
+    };
   </script>
-</head>
-<body>
   <div id="content"></div>
 </body>
 </html>
