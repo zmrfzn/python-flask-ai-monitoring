@@ -4,3 +4,4 @@ openai
 wsocket
 bottle
 cherrypy
+ws4py
