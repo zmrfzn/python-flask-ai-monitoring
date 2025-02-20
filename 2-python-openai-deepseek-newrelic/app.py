@@ -56,7 +56,7 @@ class ChatWebSocketHandler(WebSocket):
         if ("entered the room" in mData):
             cherrypy.engine.publish('websocket-broadcast', m)
         else:
-            print(mData)
+            #print(mData)
             completion = client.chat.completions.create(
                 model="deepseek-r1:latest",
                 messages=[
@@ -70,7 +70,7 @@ class ChatWebSocketHandler(WebSocket):
             for chunk in completion:
                 chunkContent = chunk.choices[0].delta.content
                 chunks.append(chunk)
-                print(chunkContent)
+                #print(chunkContent)
                 responseContent += chunkContent
                 cherrypy.engine.publish('websocket-broadcast', chunkContent)
 
@@ -82,7 +82,7 @@ class ChatWebApp(object):
     def index(self):
         return index_page % {
             'username': "User%d" % random.randint(50, 1000),
-            'ws_addr': 'wss://host-ai-monitoring-5002-zvarii92bali.env.play.instruqt.com/ws'
+            'ws_addr': 'wss://host-ai-monitoring-5002-6zqycaas2aiz.env.play.instruqt.com/ws'
         }
 
     @cherrypy.expose
