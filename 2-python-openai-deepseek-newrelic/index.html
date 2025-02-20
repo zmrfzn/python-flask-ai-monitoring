@@ -19,6 +19,12 @@
             height: 300px;
             color: #333;
         }
+
+        #chatThink {
+            width: 100%%;
+            height: 300px;
+            color: #333;
+        }
     </style>
 
     <script type="application/javascript" src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
@@ -35,7 +41,18 @@
                 e.preventDefault();
             };
             ws.onmessage = function (evt) {
-                $("#chat").val($("#chat").val() + evt.data + "\n");
+                if (evt.data.startsWith("<think>"))
+                    $("#thinkMode").prop("checked", true);
+
+                //$("#chat").val($("#chat").val() + evt.data + "\n");
+
+                if ($("#thinkMode").is(":checked"))
+                    $("#chatThink").val($("#chatThink").val() + evt.data);
+                else
+                    $("#chat").val($("#chat").val() + evt.data);
+
+                if (evt.data.startsWith("</think>"))
+                    $("#thinkMode").prop("checked", false);
             };
             ws.onopen = function () {
                 ws.send("%(username)s entered the room");
@@ -58,7 +75,20 @@
 <body>
     <div class="container">
         <div class="row">
-            <textarea id="chat" readonly="readonly" wrap></textarea>
+            <div class="form-group">
+                <div class="col-sm-2">
+                    <div>is thinking?</div>
+                </div>
+                <div class="col-sm-1">
+                    <input type="checkbox" id="thinkMode" name="thinkMode" readonly="readonly" />
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <textarea id="chatThink" readonly="readonly"></textarea>
+        </div>
+        <div class="row">
+            <textarea id="chat" readonly="readonly"></textarea>
         </div>
 
         <div class="row">

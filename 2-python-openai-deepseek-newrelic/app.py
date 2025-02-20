@@ -66,12 +66,13 @@ class ChatWebSocketHandler(WebSocket):
 
             chunks = []
             responseContent = ""
+            cherrypy.engine.publish('websocket-broadcast', "\n")
             for chunk in completion:
                 chunkContent = chunk.choices[0].delta.content
                 chunks.append(chunk)
                 print(chunkContent)
                 responseContent += chunkContent
-                cherrypy.engine.publish('websocket-broadcast', chunkContent.replace("\n", "").replace("\r", ""))
+                cherrypy.engine.publish('websocket-broadcast', chunkContent)
 
     def closed(self, code, reason="A client left the room without a proper explanation."):
         cherrypy.engine.publish('websocket-broadcast', TextMessage(reason))
@@ -79,8 +80,10 @@ class ChatWebSocketHandler(WebSocket):
 class ChatWebApp(object):
     @cherrypy.expose
     def index(self):
-        return index_page % {'username': "User%d" % random.randint(50, 1000),
-                             'ws_addr': 'wss://host-ai-monitoring-5002-ecnjz4myohph.env.play.instruqt.com/ws'}
+        return index_page % {
+            'username': "User%d" % random.randint(50, 1000),
+            'ws_addr': 'wss://host-ai-monitoring-5002-zvarii92bali.env.play.instruqt.com/ws'
+        }
 
     @cherrypy.expose
     def ws(self):
@@ -95,18 +98,20 @@ if __name__ == '__main__':
     WebSocketPlugin(cherrypy.engine).subscribe()
     cherrypy.tools.websocket = WebSocketTool()
 
-    cherrypy.quickstart(ChatWebApp(), '',
-                        config={
-                            '/': {
-                                'tools.response_headers.on': True,
-                                'tools.response_headers.headers': [
-                                    ('X-Frame-options', 'deny'),
-                                    ('X-XSS-Protection', '1; mode=block'),
-                                    ('X-Content-Type-Options', 'nosniff')
-                                ]
-                            },
-                            '/ws': {
-                                'tools.websocket.on': True,
-                                'tools.websocket.handler_cls': ChatWebSocketHandler
-                            },
-                        })
+    cherrypy.quickstart(
+        ChatWebApp(), 
+        '',
+        config={
+            '/': {
+                    'tools.response_headers.on': True,
+                'tools.response_headers.headers': [
+                    ('X-Frame-options', 'deny'),
+                    ('X-XSS-Protection', '1; mode=block'),
+                    ('X-Content-Type-Options', 'nosniff')
+                ]
+            },
+            '/ws': {
+                'tools.websocket.on': True,
+                'tools.websocket.handler_cls': ChatWebSocketHandler
+            },
+        })
