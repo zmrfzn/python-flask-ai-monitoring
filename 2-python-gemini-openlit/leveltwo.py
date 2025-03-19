@@ -2,7 +2,8 @@ import openlit
 
 import os
 from flask import Flask, render_template, request
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -10,7 +11,9 @@ logger = logging.getLogger(__name__)
 
 openlit.init()
 
-genai.configure(api_key=os.environ["API_KEY"])
+#genai.configure(api_key=os.environ["API_KEY"])
+# Only run this block for Gemini Developer API
+client = genai.Client(api_key=os.environ["API_KEY"])
 
 GEMINI_MODEL = "gemini-1.5-flash"
 #GEMINI_MODEL = "gemini-1.5-flash-8b"
@@ -22,15 +25,22 @@ app = Flask(__name__)
 ## taking the input from the user and returning the response from Gemini
 def chatCompletion(prompt):
     logger.info("prompt: "+prompt)
-    model = genai.GenerativeModel(GEMINI_MODEL)
-    generation_config=genai.types.GenerationConfig(
-        temperature=1.0,
+    response = client.models.generate_content(
+        model=GEMINI_MODEL,
+        contents=prompt,
+        config=types.GenerateContentConfig(
+            temperature=1.0,
+        ),
     )
+    #model = client.GenerativeModel(GEMINI_MODEL)
+    #generation_config=client.types.GenerationConfig(
+    #    temperature=1.0,
+    #)
     
-    response = model.generate_content(
-        prompt,
-        generation_config=generation_config,
-    )
+    #response = model.generate_content(
+    #    prompt,
+    #    generation_config=generation_config,
+    #)
     logger.info(response)
     responseText = ""
     if response.candidates:
