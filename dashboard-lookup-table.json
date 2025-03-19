@@ -26,7 +26,7 @@
                         "nrqlQueries": [
                             {
                                 "accountIds": [
-                                    NEW_RELIC_ACCOUNT_ID
+                                    YOUR_NEW_RELIC_ACCOUNT_ID
                                 ],
                                 "query": "FROM lookup(AIModelCost) select latest(`cost-input`) as '$ Input/1M tokens', latest(`cost-output`) as '$ output/1M tokens' facet vendor,response.model "
                             }
@@ -58,7 +58,7 @@
                         "nrqlQueries": [
                             {
                                 "accountIds": [
-                                    NEW_RELIC_ACCOUNT_ID
+                                    YOUR_NEW_RELIC_ACCOUNT_ID
                                 ],
                                 "query": "FROM LlmChatCompletionMessage  select  filter(sum(token_count),where role='user')  as 'Sum input tokens',filter(sum(token_count),where role='assistant')  as 'Sum output tokens' since 1 week ago facet response.model"
                             }
@@ -90,7 +90,7 @@
                         "nrqlQueries": [
                             {
                                 "accountIds": [
-                                    NEW_RELIC_ACCOUNT_ID
+                                    YOUR_NEW_RELIC_ACCOUNT_ID
                                 ],
                                 "query": "FROM LlmChatCompletionMessage  select  filter(sum(token_count),where role='user')  as 'Sum input tokens',filter(sum(token_count),where role='assistant')  as 'Sum output tokens' since 1 hour ago facet response.model TIMESERIES "
                             }
@@ -128,7 +128,7 @@
                         "nrqlQueries": [
                             {
                                 "accountIds": [
-                                    NEW_RELIC_ACCOUNT_ID
+                                    YOUR_NEW_RELIC_ACCOUNT_ID
                                 ],
                                 "query": "FROM LlmChatCompletionMessage join(from lookup(AIModelCost) select latest(`cost-input`) as costInput, latest(`cost-input-tokens`) as costInputTokens, latest(`cost-output`) as costOutput, latest(`cost-output-tokens`) as costOutputTokens facet response.model) on response.model select filter(sum(token_count)/latest(costInputTokens)*latest(costInput),where role='user')+filter(sum(token_count)/latest(costOutputTokens)*latest(costOutput),where role='assistant') as 'Cost in $', filter(sum(token_count),where role='user')+filter(sum(token_count),where role='assistant') as 'Sum tokens' since 1 week ago facet response.model "
                             }
@@ -176,7 +176,7 @@
                         "nrqlQueries": [
                             {
                                 "accountIds": [
-                                    NEW_RELIC_ACCOUNT_ID
+                                    YOUR_NEW_RELIC_ACCOUNT_ID
                                 ],
                                 "query": "FROM LlmChatCompletionMessage join(from lookup(AIModelCost) select latest(`cost-input`) as costInput, latest(`cost-input-tokens`) as costInputTokens, latest(`cost-output`) as costOutput, latest(`cost-output-tokens`) as costOutputTokens facet response.model) on response.model select sum(token_count)/latest(costInputTokens)*latest(costInput) as 'Cost in $',sum(token_count) as 'Sum tokens' since 1 week ago facet response.model where role = 'user' "
                             }
@@ -224,7 +224,7 @@
                         "nrqlQueries": [
                             {
                                 "accountIds": [
-                                    NEW_RELIC_ACCOUNT_ID
+                                    YOUR_NEW_RELIC_ACCOUNT_ID
                                 ],
                                 "query": "FROM LlmChatCompletionMessage join(from lookup(AIModelCost) select latest(`cost-output`) as costOutput, latest(`cost-output-tokens`) as costOutputTokens facet response.model since 1 month ago limit max) on response.model select sum(token_count)/latest(costOutputTokens)*latest(costOutput) as 'Cost in $',sum(token_count) as 'Sum tokens' since 1 week ago facet response.model where role = 'assistant' limit max  "
                             }
@@ -275,7 +275,7 @@
                         "nrqlQueries": [
                             {
                                 "accountIds": [
-                                    NEW_RELIC_ACCOUNT_ID
+                                    YOUR_NEW_RELIC_ACCOUNT_ID
                                 ],
                                 "query": "FROM LlmChatCompletionMessage join(from lookup(AIModelCost) select latest(`cost-input`) as costInput, latest(`cost-input-tokens`) as costInputTokens, latest(`cost-output`) as costOutput, latest(`cost-output-tokens`) as costOutputTokens facet response.model) on response.model select  filter(sum(token_count)/latest(costInputTokens)*latest(costInput),where role='user')+filter(sum(token_count)/latest(costOutputTokens)*latest(costOutput),where role='assistant') as 'Cost in $' since 1 hour ago facet response.model TIMESERIES "
                             }
@@ -316,7 +316,7 @@
                         "nrqlQueries": [
                             {
                                 "accountIds": [
-                                    NEW_RELIC_ACCOUNT_ID
+                                    YOUR_NEW_RELIC_ACCOUNT_ID
                                 ],
                                 "query": "FROM LlmChatCompletionMessage join(from lookup(AIModelCost) select latest(`cost-input`) as costInput, latest(`cost-input-tokens`) as costInputTokens, latest(`cost-output`) as costOutput, latest(`cost-output-tokens`) as costOutputTokens facet response.model) on response.model select  sum(token_count)/latest(costInputTokens)*latest(costInput) as 'Cost in $' since 1 hour ago facet response.model where role = 'user' TIMESERIES "
                             }
@@ -357,7 +357,7 @@
                         "nrqlQueries": [
                             {
                                 "accountIds": [
-                                    NEW_RELIC_ACCOUNT_ID
+                                    YOUR_NEW_RELIC_ACCOUNT_ID
                                 ],
                                 "query": "FROM LlmChatCompletionMessage join(from lookup(AIModelCost) select latest(`cost-output`) as costOutput, latest(`cost-output-tokens`) as costOutputTokens facet response.model since 1 month ago limit max) on response.model select sum(token_count)/latest(costOutputTokens)*latest(costOutput) as 'Cost in $' since 1 hour ago facet response.model where role = 'assistant' limit max TIMESERIES "
                             }
@@ -395,7 +395,7 @@
                         "nrqlQueries": [
                             {
                                 "accountIds": [
-                                    NEW_RELIC_ACCOUNT_ID
+                                    YOUR_NEW_RELIC_ACCOUNT_ID
                                 ],
                                 "query": "FROM LlmChatCompletionMessage select * since 1 week ago"
                             }
