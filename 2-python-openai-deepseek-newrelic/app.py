@@ -46,8 +46,9 @@ def chatCompletion(prompt):
     responseContent = ""
     for chunk in completion:
         chunks.append(chunk)
-        print(chunk.choices[0].delta.content)
+        #print(chunk.choices[0].delta.content)
         responseContent += chunk.choices[0].delta.content
+    print(responseContent)
     return responseContent
 
 class ChatWebSocketHandler(WebSocket):
