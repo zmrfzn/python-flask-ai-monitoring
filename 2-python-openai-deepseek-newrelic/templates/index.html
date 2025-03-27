@@ -1,25 +1,23 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/milligram.css') }}">
+  <title>My AI Bot</title>
 </head>
 <body>
-    <script type="text/javascript">
-    var ws = new WebSocket("ws://localhost:8080");
-    console.log("WebSocket is opened");
-    ws.onopen = function() {
-        console.log("WebSocket is opened with " + ws.protocol + " protocol");
-        ws.send("Hello, world from Harry");
-    };
-    ws.onmessage = function (evt) {
-        //alert(evt.data);
-        console.log(messageEvent.data);
-        document.getElementById("content").innerHTML = evt.data;
-    };
-    ws.onclose = function(closeEvent) {
-        console.log("WebSocket is closed");
-    };
-  </script>
-  <div id="content"></div>
+  <h3>My AI Bot</h3>
+  <form action="/prompt" method="POST">
+    <label for="input">Input:</label>
+    <!-- switching to textarea for wider input -->
+    <textarea placeholder="Insert Your Prompt" name="input"></textarea>
+    <input type="submit" value="Submit">
+  </form>
+    {% if output %}
+    <label for="output">Output:</label>
+    <p>{{ output }}</p>
+    {% endif %}
 </body>
 </html>
