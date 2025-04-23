@@ -1,14 +1,18 @@
-# import the New Relic Python Agent
-#import newrelic.agent
+from traceloop.sdk import Traceloop
 import os
 from flask import Flask, render_template, request
 import boto3
 from botocore.exceptions import ClientError
 import json
 import markdown
+import logging
 
-# initialize the New Relic Python agent
-#newrelic.agent.initialize('newrelic.ini')
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+Traceloop.init(
+    app_name="bedrock-openllmetry",
+)
 
 # Create a Bedrock Runtime client in the AWS Region you want to use.
 client = boto3.client("bedrock-runtime", region_name="us-east-1")
@@ -24,7 +28,7 @@ client = boto3.client("bedrock-runtime", region_name="us-east-1")
 #model_id = "meta.llama3-8b-instruct-v1:0"
 #model_id = "mistral.mistral-7b-instruct-v0:2"
 #model_id = "deepseek.r1-v1:0"
-#model_id="amazon.nova-micro-v1:0"
+model_id="amazon.nova-micro-v1:0"
 
 app = Flask(__name__)
 
@@ -50,6 +54,16 @@ def chatCompletion(prompt):
                 {
                     "role": "user",
                     "content": [{"type": "text", "text": prompt}],
+                }
+            ],
+        }
+    elif model_id == "amazon.nova-micro-v1:0":
+                #"anthropic.claude-3-haiku-20240307-v1:0"
+        native_request = {
+            "messages": [
+                {
+                    "role": "user",
+                    "content": [{"text": prompt}],
                 }
             ],
         }
@@ -137,14 +151,16 @@ def chatCompletion(prompt):
         exit(1)
 
     # Decode the response body.
-    #print(f"response: {response}")
     model_response = json.loads(response["body"].read())
+    print(f"model_response: {model_response}")
 
     # Extract and print the response text.
     
     #"amazon.titan-text-lite-v1"
     if model_id == "amazon.titan-text-lite-v1":
         response_text = model_response["results"][0]["outputText"]
+    elif model_id == "amazon.nova-micro-v1:0":
+        response_text = model_response["output"]["message"]["content"][0]["text"]
     else:
         #"anthropic.claude-3-haiku-20240307-v1:0"
         response_text = model_response["content"][0]["text"]
