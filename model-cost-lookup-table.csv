@@ -13,4 +13,12 @@ anthropic.claude-3-haiku-20240307-v1:0,0.00025,1000,0.00125,1000,Amazon Bedrock
 anthropic.claude-v2:1,0.008,1000,0.024,1000,Amazon Bedrock
 anthropic.claude-v2,0.008,1000,0.024,1000,Amazon Bedrock
 anthropic.claude-3-5-sonnet-20240620-v1:0,0.003,1000,0.015,1000,Amazon Bedrock
+anthropic.claude-3-5-sonnet-20241022-v2:0,0.003,1000,0.015,1000,Amazon Bedrock
+claude-3-5-sonnet-20241022-v2:0,0.003,1000,0.015,1000,Amazon Bedrock
+us.anthropic.claude-3-7-sonnet-20250219-v1:0,0.003,1000,0.015,1000,Amazon Bedrock
+anthropic.claude-3-7-sonnet-20250219-v1:0,0.003,1000,0.015,1000,Amazon Bedrock
+us.amazon.nova-pro-v1:0,0.00105,1000,0.0002625,1000,Amazon Bedrock
+amazon.nova-pro-v1:0,0.00105,1000,0.0002625,1000,Amazon Bedrock
+us.deepseek.r1-v1:0,0.00135,1000,0.0054,1000,Amazon Bedrock
+deepseek.r1-v1:0,0.00135,1000,0.0054,1000,Amazon Bedrock
 gemini-2.0-flash-lite,0.075,1000000,0.30,1000000,Google Gemini
