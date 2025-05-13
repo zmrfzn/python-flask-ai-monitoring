@@ -1,1 +1,4 @@
+openai
 markdown
+newrelic
+flask

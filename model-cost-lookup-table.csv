@@ -4,6 +4,9 @@ gpt-4-turbo-2024-04-09,10.00,1000000,30.00,1000000,OpenAI
 gpt-4o-2024-05-13,5.00,1000000,15.00,1000000,OpenAI
 gpt-4o,2.50,1000000,10.00,1000000,OpenAI
 gpt-4o-2024-08-06,2.50,1000000,10.00,1000000,OpenAI
+gpt-4.1-mini,0.4,1000000,1.6,1000000,OpenAI
+gpt-4.1-nano,0.1,1000000,0.4,1000000,OpenAI
+gpt-4o-mini-2024-07-18,4.00,1000000,16.00,1000000,OpenAI
 gemini-1.5-flash,0.075,1000000,0.3,1000000,Google Gemini
 gemini-1.5-flash-8b,0.0375,1000000,0.15,1000000,Google Gemini
 gemini-1.5-pro,1.25,1000000,5.00,1000000,Google Gemini
@@ -22,3 +25,5 @@ amazon.nova-pro-v1:0,0.00105,1000,0.0002625,1000,Amazon Bedrock
 us.deepseek.r1-v1:0,0.00135,1000,0.0054,1000,Amazon Bedrock
 deepseek.r1-v1:0,0.00135,1000,0.0054,1000,Amazon Bedrock
 gemini-2.0-flash-lite,0.075,1000000,0.30,1000000,Google Gemini
+mistral-small-2503,0.1,1000000,0.3,1000000,Mistral
+mistral-8b,0.1,1000000,0.1,1000000,Mistral
