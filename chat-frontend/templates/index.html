@@ -119,6 +119,25 @@
       margin-bottom: 5px;
       display: block;
     }
+
+    * New style for the chat guid specifically */
+    .chat-guid-area {
+      background-color: #f8f9fa;
+      border-radius: 8px;
+      padding: 10px;
+      margin-top: 15px;
+      color: #6c757d;
+      border-left: 3px solid #4ca1af;
+      font-size: 0.85rem;
+    }
+    
+    .chat-guid-label {
+      font-weight: 600;
+      color: #6c757d;
+      margin-bottom: 3px;
+      display: block;
+      font-size: 0.85rem;
+    }
     
     .chat-content {
       background-color: #f8f9fa;
@@ -196,9 +215,8 @@
           <h4 class="card-title">Chat with AI</h4>
           
           {% if outputChatGuid %}
-          <div class="output-area">
-            <span class="output-label">Chat ID:</span>
-            <div>{{ outputChatGuid }}</div>
+          <div class="chat-guid-area">
+            <span class="chat-guid-label">Chat ID:{{ outputChatGuid }}</span>
           </div>
           {% endif %}
           
