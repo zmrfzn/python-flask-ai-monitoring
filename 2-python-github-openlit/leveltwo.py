@@ -16,9 +16,6 @@ model_id = os.environ["MODEL"] # e.g. "gpt-4o-mini"
 
 app = Flask(__name__)
 
-# initialize the New Relic Python agent
-newrelic.agent.initialize('newrelic.ini')
-
 # Read prompts from the prompts.txt file
 prompts = []
 try:
