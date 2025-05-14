@@ -148,12 +148,87 @@
       max-height: 400px; /* Taller to utilize vertical space */
       overflow-y: auto;
     }
+
+    .btn-disabled {
+      background-color: #cccccc;
+      color: #666666;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: not-allowed;
+      margin-top: 5px;
+      opacity: 0.7;
+    }
   </style>
   <script type="text/javascript">
     function enterGame(obj) {
       var game = obj.innerHTML;
       document.getElementById('input').value = game;
+      // Enable the button when a game is selected
+      enableSubmitButton();
     }
+    
+    // Function to check if input has content and enable/disable button accordingly
+    function enableSubmitButton() {
+      var inputText = document.getElementById('input').value.trim();
+      var submitButton = document.getElementById('game-prompt-button');
+      
+      if (inputText.length > 0) {
+        submitButton.disabled = false;
+        submitButton.classList.remove('btn-disabled');
+        submitButton.classList.add('btn-custom');
+      } else {
+        submitButton.disabled = true;
+        submitButton.classList.remove('btn-custom');
+        submitButton.classList.add('btn-disabled');
+      }
+    }
+    
+    // Initialize button state when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      enableSubmitButton();
+      
+      // Add input event listener to textarea
+      document.getElementById('input').addEventListener('input', enableSubmitButton);
+      
+      // Check if chat should be enabled
+      var chatInput = document.getElementById('inputGameInteraction');
+      var chatButton = document.getElementById('chat-button');
+      
+      if (chatInput && chatButton) {
+        // Enable or disable chat button based on outputChatGuid presence
+        var hasChatGuid = {% if outputChatGuid %}true{% else %}false{% endif %};
+        
+        if (!hasChatGuid) {
+          chatButton.disabled = true;
+          chatButton.classList.add('btn-disabled');
+          chatButton.classList.remove('btn-custom');
+          chatInput.disabled = true;
+          chatInput.placeholder = "Start a game to chat with AI...";
+        } else {
+          // Enable chat button only when there's text in the input
+          chatInput.addEventListener('input', function() {
+            if (this.value.trim().length > 0) {
+              chatButton.disabled = false;
+              chatButton.classList.remove('btn-disabled');
+              chatButton.classList.add('btn-custom');
+            } else {
+              chatButton.disabled = true;
+              chatButton.classList.remove('btn-custom');
+              chatButton.classList.add('btn-disabled');
+            }
+          });
+          
+          // Initial state check for chat button
+          if (chatInput.value.trim().length === 0) {
+            chatButton.disabled = true;
+            chatButton.classList.remove('btn-custom');
+            chatButton.classList.add('btn-disabled');
+          }
+        }
+      }
+    });
   </script>
 </head>
 <body>
@@ -188,7 +263,7 @@
           <form action="/activities/search" method="POST">
             <label for="input" class="output-label">Enter or select a game:</label>
             <textarea placeholder="Type or select a game from the list" name="input" id="input">{{input_prompt}}</textarea>
-            <button type="submit" class="btn-custom">
+            <button type="submit" id="game-prompt-button" class="btn-disabled" disabled>
               <i class="bi bi-search"></i> Get Game Prompt
             </button>
           </form>
@@ -229,8 +304,8 @@
           
           <form action="/chat/guid" method="POST" class="mt-3">
             <label for="inputGameInteraction" class="output-label">Your Message:</label>
-            <textarea placeholder="Type your message to the AI..." name="inputGameInteraction"></textarea>
-            <button type="submit" class="btn-custom">
+            <textarea placeholder="Type your message to the AI..." name="inputGameInteraction" id="inputGameInteraction" {% if not outputChatGuid %}disabled{% endif %}></textarea>
+            <button type="submit" id="chat-button" class="{% if not outputChatGuid %}btn-disabled{% else %}btn-custom{% endif %}" {% if not outputChatGuid %}disabled{% endif %}>
               <i class="bi bi-send"></i> Send Message
             </button>
           </form>
