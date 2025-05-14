@@ -4,59 +4,232 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/milligram.css') }}">
-  <title>My AI Bot</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+  <title>AI Game Assistant</title>
+  <style>
+    body {
+      background: linear-gradient(135deg, #2c3e50, #4ca1af);
+      color: #333;
+      min-height: 100vh;
+      padding: 40px 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    .container {
+      max-width: 1400px; /* Increased width to accommodate 3 columns */
+    }
+    
+    .app-title {
+      color: white;
+      text-align: center;
+      margin-bottom: 30px;
+      font-weight: 700;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    .card {
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      background-color: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 20px;
+      margin-bottom: 20px;
+      height: 100%;
+    }
+    
+    .card-title {
+      color: #2c3e50;
+      font-weight: 600;
+      margin-bottom: 15px;
+      border-bottom: 2px solid #4ca1af;
+      padding-bottom: 8px;
+      font-size: 1.1rem; /* Slightly smaller font size */
+    }
+    
+    textarea {
+      border-radius: 10px;
+      border: 1px solid #ddd;
+      padding: 12px;
+      min-height: 100px;
+      width: 100%;
+      margin-bottom: 15px;
+      font-size: 16px;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+    }
+    
+    textarea:focus {
+      border-color: #4ca1af;
+      box-shadow: 0 3px 15px rgba(76, 161, 175, 0.3);
+      outline: none;
+    }
+    
+    .btn-custom {
+      background-color: #4ca1af;
+      color: white;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 5px;
+    }
+    
+    .btn-custom:hover {
+      background-color: #2c3e50;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(44, 62, 80, 0.3);
+    }
+    
+    .game-list {
+      max-height: 400px; /* Taller to use vertical space */
+      overflow-y: auto;
+      margin-top: 10px;
+    }
+    
+    .game-item {
+      padding: 8px 12px;
+      margin-bottom: 6px;
+      background-color: #f8f9fa;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border-left: 3px solid #4ca1af;
+    }
+    
+    .game-item:hover {
+      background-color: #e9ecef;
+      transform: translateX(3px);
+    }
+    
+    .output-area {
+      background-color: #f8f9fa;
+      border-radius: 10px;
+      padding: 15px;
+      margin-top: 15px;
+      color: #333;
+      border-left: 4px solid #4ca1af;
+    }
+    
+    .output-label {
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 5px;
+      display: block;
+    }
+    
+    .chat-content {
+      background-color: #f8f9fa;
+      border-radius: 10px;
+      padding: 15px;
+      margin-top: 15px;
+      min-height: 100px;
+      max-height: 400px; /* Taller to utilize vertical space */
+      overflow-y: auto;
+    }
+  </style>
   <script type="text/javascript">
     function enterGame(obj) {
       var game = obj.innerHTML;
-      document.getElementById('input').value = encodeURI(game);
+      document.getElementById('input').value = game;
     }
   </script>
 </head>
 <body>
-  <h3>My AI Bot</h3>
-  <table>
-    <tr>
-      <td width="50%">
-  <form action="/activities" method="GET">
-    <nobr>
-      <input type="submit" value="Get games">{% if outputGames %}
-        <label for="outputGames">Output:</label>
-        {% for game in outputGames %}<div><a onclick='javascript:enterGame(this);'>{{game}}</a></div>{% endfor %}
-      {% endif %}
-    </nobr>
-  </form>
-  <form action="/activities/search" method="POST">
-    <label for="input">Input:</label>
-    <!-- switching to textarea for wider input -->
-    <textarea placeholder="Insert Your Game" name="input" id="input">{{input_prompt}}</textarea>
-    <input type="submit" value="Get game prompt">
-  </form>
-  <form action="/chat" method="POST">
-    {% if outputGamePrompt %}
-    <textarea name="inputGamePrompt">{{outputGamePrompt}}</textarea>
-    <div>{{ outputGamePrompt }}</div>
-    {% endif %}
-    <input type="submit" value="Submit prompt">
-  </form>
-  </td>
-  <td width="50%">
-    {% if outputChatGuid %}
-    <nobr><label for="outputChatGuid">Chat Guid:</label><div>{{ outputChatGuid }}</div></nobr>
-    {% endif %}
-    {% if outputChatContent %}
-    <label for="outputChatContent">Chat Content:</label><div>{{ outputChatContent }}</div>
-    {% endif %}
-  <form action="/chat/guid" method="POST">
-    <textarea placeholder="Insert Your Game Interaction" name="inputGameInteraction"></textarea>
-    <input type="submit" value="Submit game interaction">
-  </form>
-    {% if outputChatInteraction %}
-    <label for="outputChatInteraction">Chat Interaction:</label>
-    <div>{{ outputChatInteraction }}</div>
-    {% endif %}
-    </td></tr>
-    </table>
-    <p><br /><br /><br /></p>
+  <div class="container">
+    <h2 class="app-title">AI Game Assistant</h2>
+    
+    <div class="row">
+      <!-- First Column: Game List -->
+      <div class="col-md-4">
+        <div class="card h-100">
+          <h4 class="card-title">Select a Game</h4>
+          <form action="/activities" method="GET">
+            <button type="submit" class="btn-custom">
+              <i class="bi bi-controller"></i> Load Game List
+            </button>
+          </form>
+          
+          {% if outputGames %}
+          <div class="game-list mt-3">
+            {% for game in outputGames %}
+            <div class="game-item" onclick="enterGame(this)">{{game}}</div>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      
+      <!-- Second Column: Game Selection & Prompt -->
+      <div class="col-md-4">
+        <div class="card h-100">
+          <h4 class="card-title">Game Selection</h4>
+          <form action="/activities/search" method="POST">
+            <label for="input" class="output-label">Enter or select a game:</label>
+            <textarea placeholder="Type or select a game from the list" name="input" id="input">{{input_prompt}}</textarea>
+            <button type="submit" class="btn-custom">
+              <i class="bi bi-search"></i> Get Game Prompt
+            </button>
+          </form>
+          
+          {% if outputGamePrompt %}
+          <div class="output-area mt-3">
+            <span class="output-label">Game Prompt:</span>
+            <div>{{ outputGamePrompt }}</div>
+          </div>
+          
+          <form action="/chat" method="POST" class="mt-3">
+            <input type="hidden" name="inputGamePrompt" value="{{outputGamePrompt}}">
+            <button type="submit" class="btn-custom">
+              <i class="bi bi-chat-dots"></i> Start Game with This Prompt
+            </button>
+          </form>
+          {% endif %}
+        </div>
+      </div>
+      
+      <!-- Third Column: Chat Interface -->
+      <div class="col-md-4">
+        <div class="card h-100">
+          <h4 class="card-title">Chat with AI</h4>
+          
+          {% if outputChatGuid %}
+          <div class="output-area">
+            <span class="output-label">Chat ID:</span>
+            <div>{{ outputChatGuid }}</div>
+          </div>
+          {% endif %}
+          
+          {% if outputChatContent %}
+          <div class="chat-content">
+            <span class="output-label">AI Response:</span>
+            <div>{{ outputChatContent }}</div>
+          </div>
+          {% endif %}
+          
+          <form action="/chat/guid" method="POST" class="mt-3">
+            <label for="inputGameInteraction" class="output-label">Your Message:</label>
+            <textarea placeholder="Type your message to the AI..." name="inputGameInteraction"></textarea>
+            <button type="submit" class="btn-custom">
+              <i class="bi bi-send"></i> Send Message
+            </button>
+          </form>
+          
+          {% if outputChatInteraction %}
+          <div class="chat-content mt-3">
+            <span class="output-label">Latest Response:</span>
+            <div>{{ outputChatInteraction }}</div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    
+    <footer class="text-center text-white mt-5">
+      <p class="small">© 2025 AI Game Assistant</p>
+    </footer>
+  </div>
 </body>
 </html>
