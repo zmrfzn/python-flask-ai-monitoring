@@ -1,4 +1,4 @@
 openai
 flask
-traceloop-sdk
+arize-phoenix-otel
 markdown

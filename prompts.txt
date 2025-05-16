@@ -1,7 +1,7 @@
 - Who are you?
 - What do you know about New Relic?
 - Who invented New Relic?
-- Where does the name 'New Relic' come from?
+- Where does the name New Relic come from?
 - Tell me more about .NET Aspire
 - What are the unique selling points of Microsoft Azure?
 - What are the different options/regions Microsoft Azure offers in Germany?
