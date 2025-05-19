@@ -8,9 +8,23 @@ import json
 from core.timer_lib import timer
 from core import instrument_agent_invocation, flush_telemetry
 import logging
+from flask import Flask, render_template, request
+import markdown
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+app = Flask(__name__)
+
+# Read prompts from the prompts.txt file
+prompts = []
+try:
+    with open("prompts.txt", "r") as file:
+        # Skip lines that are empty or comments (starting with //)
+        prompts = [line.strip() for line in file if line.strip()
+                   and not line.startswith("//")]
+except Exception as e:
+    print(f"Error reading prompts file: {e}")
 
 
 @instrument_agent_invocation
@@ -65,7 +79,7 @@ def process_streaming_response(stream):
     return full_response
 
 
-if __name__ == "__main__":
+def agentInteraction(prompt):
     import os
     import base64
     start = time.time()
@@ -88,7 +102,7 @@ if __name__ == "__main__":
             f"{langfuse_public_key}:{langfuse_secret_key}".encode()
         ).decode()
 
-    # Set OpenTelemetry environment variables for Langfuse
+    # Set OpenTelemetry environment variables
     # os.environ["OTEL_EXPORTER_OTLP_ENDPOINT"] = "https://otlp.nr-data.net:443"
     # os.environ["OTEL_EXPORTER_OTLP_HEADERS"] = "api-key=NEW_RELIC_LICENSE_KEY"
 
@@ -108,7 +122,8 @@ if __name__ == "__main__":
     trace_id = str(uuid.uuid4())
 
     # Prompt
-    question = config["question"]["question"]  # your prompt to the agent
+    # question = config["question"]["question"]  # your prompt to the agent
+    question = prompt
     # Set streaming mode: True for streaming final response, False for non-streaming
     streaming = False
 
@@ -133,6 +148,7 @@ if __name__ == "__main__":
     )
 
     # Handle the response appropriately based on streaming mode
+    resp = response
     if isinstance(response, dict) and "error" in response:
         print(f"\nError: {response['error']}")
     elif streaming and isinstance(response, dict) and "completion" in response:
@@ -146,6 +162,7 @@ if __name__ == "__main__":
         print("\n🤖 Agent response:")
         if isinstance(response, dict) and "extracted_completion" in response:
             print(response["extracted_completion"])
+            resp = response["extracted_completion"]
         elif (
             isinstance(response, dict)
             and "completion" in response
@@ -153,6 +170,7 @@ if __name__ == "__main__":
         ):
             print("Processing completion:")
             full_response = process_streaming_response(response["completion"])
+            resp = full_response
             print(f"\nFull response: {full_response}")
         else:
             print("Raw response:")
@@ -161,3 +179,26 @@ if __name__ == "__main__":
     # Flush telemetry data
     flush_telemetry()
     timer.reset_all()
+
+    return resp
+
+
+@app.route("/")
+def home():
+    return render_template("index.html", prompts=prompts)
+
+
+@app.route("/prompt", methods=["POST"])
+def prompt():
+    input_prompt = request.form.get("input")
+    output_prompt = agentInteraction(input_prompt)
+    html_output = markdown.markdown(output_prompt)
+    # html_output = output_prompt
+
+    return render_template("index.html", input=input_prompt, output=html_output, prompts=prompts)
+
+
+# make the server publicly available via port 5004
+# flask --app levelsix.py run --host 0.0.0.0 --port 5004
+if __name__ == '__main__':
+    app.run(host="0.0.0.0", debug=True, port=5004)

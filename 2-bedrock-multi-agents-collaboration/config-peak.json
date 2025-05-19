@@ -15,6 +15,6 @@
         "agent_model_id": "anthropic.claude-3-haiku-20240307-v1:0"
     },
     "question": {
-        "question": "what energy efficiency advice can you give based on the videos showing lamps in the living room, please include the original knowledge base source"
+        "question": "What energy efficiency advice can you give based on the videos showing lamps in the living room, please include the original knowledge base source"
     }
 }
