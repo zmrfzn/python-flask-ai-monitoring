@@ -1,0 +1,20 @@
+{
+    "langfuse": {
+        "project_name": "Your Project",
+        "environment": "development",
+        "langfuse_public_key": "langfuse_public_key",
+        "langfuse_secret_key": "langfuse_secret_key",
+        "langfuse_api_url": "https://otlp.nr-data.net:443"
+    },
+    "agent": {
+        "agentId": "U1N0M5NVCM",
+        "agentAliasId": "OS4P2Q7H33"
+    },
+    "user": {
+        "userId": "user123",
+        "agent_model_id": "anthropic.claude-3-haiku-20240307-v1:0"
+    },
+    "question": {
+        "question": "what energy efficiency advice can you give based on the videos showing lamps in the living room, please include the original knowledge base source"
+    }
+}

@@ -1,0 +1,4 @@
+langchain_anthropic
+langchain_community
+markdown
+newrelic

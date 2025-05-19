@@ -1,0 +1,12 @@
+What do you know about LambdaConf?
+What are the most famous attractions in Estes Park?
+What do you know about New Relic?
+Who invented New Relic?
+Where does the name New Relic come from?
+When you WebAssembly on the server-side should be considered?
+Tell me more about .NET Aspire
+What are the unique selling points of Microsoft Azure?
+What are the different options/regions Microsoft Azure offers in Germany?
+When did Microsoft Azure first launch?
+What was the original name of Microsoft Azure?
+Why should developers attend Microsoft Build conference?

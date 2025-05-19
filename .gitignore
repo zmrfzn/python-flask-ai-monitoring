@@ -3,4 +3,5 @@
 */__pycache__
 */.venv
 */newrelic-python-agent.log
-
+trace_logs.json
+__pycache__
