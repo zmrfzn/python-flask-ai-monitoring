@@ -5,7 +5,7 @@ from openai import OpenAI
 from flask import Flask, render_template, request
 import markdown
 
-Traceloop.init(disable_batch=True)
+Traceloop.init(app_name="ai-bot-openllmetry", disable_batch=True)
 
 client = OpenAI(
     base_url="https://models.inference.ai.azure.com",
