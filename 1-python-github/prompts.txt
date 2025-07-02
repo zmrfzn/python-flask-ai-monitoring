@@ -3,7 +3,7 @@ What are the most famous attractions in Munich/Germany?
 What do you know about New Relic?
 Who invented New Relic?
 Where does the name 'New Relic' come from?
-When you WebAssembly on the server-side should be considered?
+When should WebAssembly on the server-side be considered?
 Tell me more about .NET Aspire
 What are the unique selling points of Microsoft Azure?
 What are the different options/regions Microsoft Azure offers in Germany?
