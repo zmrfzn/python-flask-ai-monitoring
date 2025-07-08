@@ -5,7 +5,7 @@ from openai import OpenAI
 from flask import Flask, render_template, request
 import markdown
 
-openlit.init()
+openlit.init(application_name="ai-bot-openlit")
 
 client = OpenAI(
     base_url="https://models.inference.ai.azure.com",

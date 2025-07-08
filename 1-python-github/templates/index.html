@@ -23,6 +23,7 @@
             backdrop-filter: blur(10px);
             padding: 30px;
             margin-bottom: 20px;
+            height: 100%;
         }
         
         h3 {
@@ -72,7 +73,7 @@
             background-color: white;
             border-radius: 10px;
             padding: 20px;
-            margin-top: 20px;
+            margin-top: 10px;
             color: #333;
             box-shadow: 0 3px 15px rgba(0, 0, 0, 0.05);
             min-height: 200px;
@@ -88,14 +89,9 @@
         }
         
         .container {
-            max-width: 900px;
+            max-width: 1200px;
         }
         
-        .output-section {
-            margin-top: 30px;
-        }
-        
-        /* New styles for prompts section */
         .prompt-section {
             margin-bottom: 25px;
             background-color: rgba(255, 255, 255, 0.8);
@@ -132,6 +128,21 @@
             background-color: #e0f0e8;
             transform: translateX(3px);
         }
+        
+        /* Make both cards visible at all times with a min-height */
+        #response-card {
+            min-height: 400px;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 767.98px) {
+            .row {
+                flex-direction: column;
+            }
+            .col-md-6 {
+                width: 100%;
+            }
+        }
     </style>
     <script>
         // Function to select and copy a prompt to the textarea
@@ -144,56 +155,64 @@
 </head>
 <body>
   <div class="container">
-    <div class="card">
-      <div class="text-center">
-        <h3>My AI Bot</h3>
-      </div>
-      
-      {% if prompts %}
-      <div class="prompt-section">
-        <div class="prompt-title">Sample Prompts (Click to use):</div>
-        <div class="prompt-list">
-          {% for prompt in prompts %}
-          <div class="prompt-item" onclick="selectPrompt('{{ prompt }}')">
-            {{ prompt }}
+    <div class="text-center mb-4">
+      <h3 class="text-white">My AI Bot</h3>
+    </div>
+    
+    <div class="row">
+      <!-- Input Card -->
+      <div class="col-md-6 mb-4 mb-md-0">
+        <div class="card">
+          <h4 class="mb-4">Ask a Question</h4>
+          
+          {% if prompts %}
+          <div class="prompt-section">
+            <div class="prompt-title">Sample Prompts (Click to use):</div>
+            <div class="prompt-list">
+              {% for prompt in prompts %}
+              <div class="prompt-item" onclick="selectPrompt('{{ prompt }}')">
+                {{ prompt }}
+              </div>
+              {% endfor %}
+            </div>
           </div>
-          {% endfor %}
-        </div>
-      </div>
-      {% endif %}
-      
-      <form action="/prompt" method="POST">
-        <div class="mb-4">
-          <label for="input" class="form-label">Ask me anything:</label>
-          {% if input %}
-          <textarea 
-            id="input-textarea"
-            class="form-control" 
-            name="input"
-            required>{{ input }}</textarea>
-          {% else %}
-          <textarea 
-            id="input-textarea"
-            class="form-control" 
-            placeholder="Type your question or prompt here..." 
-            name="input"
-            required></textarea>
           {% endif %}
+          
+          <form action="/prompt" method="POST">
+            <div class="mb-4">
+              <label for="input" class="form-label">Ask me anything:</label>
+              {% if input %}
+              <textarea 
+                id="input-textarea"
+                class="form-control" 
+                name="input"
+                required>{{ input }}</textarea>
+              {% else %}
+              <textarea 
+                id="input-textarea"
+                class="form-control" 
+                placeholder="Type your question or prompt here..." 
+                name="input"
+                required></textarea>
+              {% endif %}
+            </div>
+            
+            <div class="text-end">
+              <button type="submit" class="btn-submit">
+                <i class="bi bi-send"></i> Submit
+              </button>
+            </div>
+          </form>
         </div>
-        
-        <div class="text-end">
-          <button type="submit" class="btn-submit">
-            <i class="bi bi-send"></i> Submit
-          </button>
-        </div>
-      </form>
-      
-      {% if output %}
-      <div class="output-section">
-        <label for="output">AI Response:</label>
-        <div id="markdown-preview">{{ output | safe }}</div>
       </div>
-      {% endif %}
+      
+      <!-- Response Card -->
+      <div class="col-md-6">
+        <div id="response-card" class="card">
+          <h4 class="mb-4">AI Response</h4>
+          <div id="markdown-preview">{{ output | safe }}</div>
+        </div>
+      </div>
     </div>
   </div>
 
