@@ -1,10 +1,16 @@
-- Who are you?
-- What do you know about New Relic?
-- Who invented New Relic?
-- Where does the name New Relic come from?
-- Tell me more about .NET Aspire
-- What are the unique selling points of Microsoft Azure?
-- What are the different options/regions Microsoft Azure offers in Germany?
-- When did Microsoft Azure first launch?
-- What was the original name of Microsoft Azure?
-- Why should developers attend Microsoft Build conference?
+What do you know about New Relic?
+Who invented New Relic?
+Where does the name 'New Relic' come from?
+What do you know about DevBcn?
+What are the most famous attractions in Barcelona/Spain?
+What do you know about apidays Munich?
+What are the most famous attractions in Munich/Germany?
+What do you know about DevOpsPro Europe?
+What are the most famous attractions in Vilnius/Lithuania?
+When should WebAssembly on the server-side be considered?
+Tell me more about .NET Aspire
+What are the unique selling points of Microsoft Azure?
+What are the different options/regions Microsoft Azure offers in Germany?
+When did Microsoft Azure first launch?
+What was the original name of Microsoft Azure?
+Why should developers attend Microsoft Build conference?

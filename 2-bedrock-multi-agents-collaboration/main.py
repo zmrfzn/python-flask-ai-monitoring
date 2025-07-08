@@ -19,7 +19,7 @@ app = Flask(__name__)
 # Read prompts from the prompts.txt file
 prompts = []
 try:
-    with open("prompts.txt", "r") as file:
+    with open("../prompts.txt", "r") as file:
         # Skip lines that are empty or comments (starting with //)
         prompts = [line.strip() for line in file if line.strip()
                    and not line.startswith("//")]
