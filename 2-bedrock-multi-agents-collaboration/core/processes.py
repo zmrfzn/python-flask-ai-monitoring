@@ -18,6 +18,7 @@ from .agent import extract_trace_id
 # Initialize logging
 logger = logging.getLogger(__name__)
 
+
 def get_time():
     "Get the time at which trace part was received"
     end_timestamp = time.time()
@@ -27,6 +28,7 @@ def get_time():
         .isoformat()
     )
     return end_timestamp, end_time_iso
+
 
 def get_TraceEventtime(trace_data):
     # Get start timestamp from eventTime
@@ -41,6 +43,7 @@ def get_TraceEventtime(trace_data):
         return start_timestamp, start_time_iso
     else:
         return None, None
+
 
 def add_latency(trace_data):
     end_timestamp, end_time_iso = get_time()
@@ -60,7 +63,8 @@ def process_orchestration_trace(trace_data, parent_span, active_spans_dict):
     )
 
     # Extract orchestration trace from the full trace object
-    orchestration_trace = trace_data.get("trace", {}).get("orchestrationTrace", {})
+    orchestration_trace = trace_data.get(
+        "trace", {}).get("orchestrationTrace", {})
 
     # Get trace ID consistently
     trace_id = extract_trace_id(trace_data, "orchestration")
@@ -78,7 +82,7 @@ def process_orchestration_trace(trace_data, parent_span, active_spans_dict):
                 SpanAttributes.LLM_REQUEST_MODEL, "Not-Configured"
             ),
             "stream_mode": parent_span.attributes.get("stream_mode", False),
-        },  
+        },
     )
     # Store in global active_spans for backward compatibility
     active_spans_dict["orchestration_span"] = orchestration_span
@@ -110,7 +114,8 @@ def process_orchestration_trace(trace_data, parent_span, active_spans_dict):
                 "text", ""
             )
             if model_input_text:  # Only set if not empty
-                current_span.set_attribute("model.input.text", model_input_text)
+                current_span.set_attribute(
+                    "model.input.text", model_input_text)
             current_span.set_attribute(
                 "model.input.type",
                 orchestration_trace["modelInvocationInput"].get(
@@ -194,7 +199,8 @@ def process_orchestration_trace(trace_data, parent_span, active_spans_dict):
             and "finalResponse" in orchestration_trace["observation"]
         ):
             # Create a final response span
-            final_response_processed = handle_final_response(trace_data, current_span)
+            final_response_processed = handle_final_response(
+                trace_data, current_span)
 
             # Only if final response was successfully processed
             if final_response_processed:
@@ -235,12 +241,17 @@ def process_orchestration_trace(trace_data, parent_span, active_spans_dict):
 def process_post_processing_trace(trace_data, root_span, active_spans_dict):
     """Process post-processing trace with proper span hierarchy"""
     # logger.warning(f"Post-processing trace : {trace_data}")
+    # print root_span if it exists
+    if not root_span:
+        print("root_span : ", root_span)
+
     time_trace_id = extract_trace_id(trace_data)
     start_time, end_time, duration = timer.check_start_time(
         "post_processing", trace_data, time_trace_id
     )
     # Extract post processing trace from the full trace object
-    post_processing_trace = trace_data.get("trace", {}).get("postProcessingTrace", {})
+    post_processing_trace = trace_data.get(
+        "trace", {}).get("postProcessingTrace", {})
     # Get trace ID
     trace_id = None
     for field in ["modelInvocationInput", "modelInvocationOutput"]:
@@ -274,7 +285,7 @@ def process_post_processing_trace(trace_data, root_span, active_spans_dict):
 
         # Create new L2 post-processing span using start_span() for persistence
         # CRITICAL: We use start_span() (not start_as_current_span) because we need to store and reuse the span
-        post_span = trace.get_tracer("bedrock-agent-langfuse").start_span(
+        post_span = trace.get_tracer("bedrock-agent-tracing").start_span(
             name="postProcessingTrace",
             kind=SpanKind.CLIENT,
             attributes={
@@ -323,7 +334,7 @@ def process_post_processing_trace(trace_data, root_span, active_spans_dict):
             or not post_span.is_recording()
         ):
             # Create new span if previous one is no longer valid
-            post_span = trace.get_tracer("bedrock-agent-langfuse").start_span(
+            post_span = trace.get_tracer("bedrock-agent-tracing").start_span(
                 name="postProcessingTrace",
                 kind=SpanKind.CLIENT,
                 attributes={
@@ -363,9 +374,11 @@ def process_post_processing_trace(trace_data, root_span, active_spans_dict):
                 model_input = post_processing_trace["modelInvocationInput"]
                 model_input_text = model_input.get("text", "")
                 if model_input_text:  # Only set if not empty
-                    current_span.set_attribute("model.input.text", model_input_text)
+                    current_span.set_attribute(
+                        "model.input.text", model_input_text)
                 current_span.set_attribute(
-                    "model.input.type", model_input.get("type", "POST_PROCESSING")
+                    "model.input.type", model_input.get(
+                        "type", "POST_PROCESSING")
                 )
 
                 # Add inference configuration if available

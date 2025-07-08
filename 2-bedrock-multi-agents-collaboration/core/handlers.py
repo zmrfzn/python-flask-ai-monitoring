@@ -40,6 +40,7 @@ logger = logging.getLogger(__name__)
 # Global tracer reference
 tracer = None
 
+
 def set_span_timing(span, start_time_iso, end_time_iso, latency_ms, span_key=None):
     """Safely set span timing if not already set"""
     from .agent import span_manager
@@ -52,15 +53,18 @@ def set_span_timing(span, start_time_iso, end_time_iso, latency_ms, span_key=Non
         return True
     return False
 
+
 def set_tracer(tracer_instance):
     """Set tracer instance from main module"""
     global tracer
     tracer = tracer_instance
 
+
 def handle_preprocessing(trace_data: Dict[str, Any], parent_span):
     """Handle pre-processing trace events with proper L2-L3-L4 hierarchy"""
     # Extract preprocessing trace data from the full trace object
-    preprocessing_trace = trace_data.get("trace", {}).get("preProcessingTrace", {})
+    preprocessing_trace = trace_data.get(
+        "trace", {}).get("preProcessingTrace", {})
     # Extract trace ID from preprocessing trace
     trace_id = None
     if "modelInvocationOutput" in preprocessing_trace:
@@ -68,7 +72,8 @@ def handle_preprocessing(trace_data: Dict[str, Any], parent_span):
             "traceId", "unknown"
         )
     elif "modelInvocationInput" in preprocessing_trace:
-        trace_id = preprocessing_trace["modelInvocationInput"].get("traceId", "unknown")
+        trace_id = preprocessing_trace["modelInvocationInput"].get(
+            "traceId", "unknown")
     else:
         trace_id = f"preprocessing-{time.time()}"
     # Create L2 preprocessing span
@@ -105,10 +110,12 @@ def handle_preprocessing(trace_data: Dict[str, Any], parent_span):
     )
     # Set and protect timing immediately
     span_key = f"preprocessing:{trace_id}"
-    set_span_timing(preprocessing_span, start_time, end_time, duration, span_key)
+    set_span_timing(preprocessing_span, start_time,
+                    end_time, duration, span_key)
     # Register the span in span_manager
     from .agent import span_manager
     if not preprocessing_span.is_recording():
+        print("Preprocessing span is not recording")
         preprocessing_span.start()
     span_manager.spans[span_key] = preprocessing_span
     span_manager.active_traces["preprocessing"] = trace_id
@@ -135,9 +142,11 @@ def handle_preprocessing(trace_data: Dict[str, Any], parent_span):
     if "modelInvocationOutput" in preprocessing_trace:
         update_preprocessing_span(trace_data, preprocessing_span)
 
+
 def update_preprocessing_span(trace_data: Dict[str, Any], preprocessing_span):
     """Update an existing preprocessing span with output data"""
-    preprocessing_trace = trace_data.get("trace", {}).get("preProcessingTrace", {})
+    preprocessing_trace = trace_data.get(
+        "trace", {}).get("preProcessingTrace", {})
     # Only process output updates
     if "modelInvocationOutput" not in preprocessing_trace:
         return
@@ -235,7 +244,8 @@ def update_preprocessing_span(trace_data: Dict[str, Any], preprocessing_span):
                 assessment_span.set_attribute(
                     "parsedResponse", json.dumps(parsed_response)
                 )
-                assessment_span.set_attribute("isValid", parsed_response.get("isValid"))
+                assessment_span.set_attribute(
+                    "isValid", parsed_response.get("isValid"))
                 # Add rationale directly
                 if "rationale" in parsed_response:
                     assessment_span.set_attribute(
@@ -261,13 +271,16 @@ def handle_llm_invocation(
     """Handle LLM invocation - fixes duplicate LLM spans issue"""
     trace_id = extract_trace_id(trace_data)
     name = f"{parent_component}_llm"
-    start_time, end_time, duration = timer.check_start_time(name, trace_data, trace_id)
+    start_time, end_time, duration = timer.check_start_time(
+        name, trace_data, trace_id)
     # Determine which component and get trace from the full trace object
     if parent_component == "orchestration":
-        component_trace = trace_data.get("trace", {}).get("orchestrationTrace", {})
+        component_trace = trace_data.get(
+            "trace", {}).get("orchestrationTrace", {})
         output_span_name = "OrchestrationModelInvocationOutput"
     else:
-        component_trace = trace_data.get("trace", {}).get("postProcessingTrace", {})
+        component_trace = trace_data.get(
+            "trace", {}).get("postProcessingTrace", {})
         output_span_name = "PostProcessingModelInvocationOutput"
     # Store input on parent span instead of creating a separate LLM span
     if "modelInvocationInput" in component_trace:
@@ -331,11 +344,13 @@ def handle_llm_invocation(
             # Add raw response
             if "rawResponse" in model_output:
                 raw_content = model_output["rawResponse"].get("content", "")
-                llm_span.set_attribute(SpanAttributes.LLM_COMPLETIONS, raw_content)
+                llm_span.set_attribute(
+                    SpanAttributes.LLM_COMPLETIONS, raw_content)
                 parent_span.set_attribute("model.output", raw_content)
             else:
                 raw_content = model_output["parsedResponse"].get("text", "")
-                llm_span.set_attribute(SpanAttributes.LLM_COMPLETIONS, raw_content)
+                llm_span.set_attribute(
+                    SpanAttributes.LLM_COMPLETIONS, raw_content)
                 parent_span.set_attribute("model.output", raw_content)
 
             # Create L4 model output span (child of llm span)
@@ -361,8 +376,10 @@ def handle_llm_invocation(
             ) as output_span:
                 # Add raw response
                 if "rawResponse" in model_output:
-                    raw_content = model_output["rawResponse"].get("content", "")
-                    output_span.set_attribute(SpanAttributes.LLM_PROMPTS, prompt)
+                    raw_content = model_output["rawResponse"].get(
+                        "content", "")
+                    output_span.set_attribute(
+                        SpanAttributes.LLM_PROMPTS, prompt)
                     output_span.set_attribute(
                         SpanAttributes.LLM_COMPLETIONS, raw_content
                     )
@@ -371,7 +388,9 @@ def handle_llm_invocation(
                 # Add metadata
                 if "metadata" in model_output:
                     metadata = model_output["metadata"]
-                    output_span.set_attribute("metadata", json.dumps(metadata))
+                    # print("Metadata:", metadata)
+                    output_span.set_attribute(
+                        "metadata", json.dumps(metadata, default=str))
 
                     # Add token usage directly
                     if "usage" in metadata:
@@ -395,12 +414,40 @@ def handle_llm_invocation(
                         parent_component == "postprocessing"
                         and "text" in parsed_response
                     ):
-                        output_span.set_attribute("result", parsed_response["text"])
-                        parent_span.set_attribute("result", parsed_response["text"])
-                        llm_span.set_attribute("result", parsed_response["text"])
+                        output_span.set_attribute(
+                            "result", parsed_response["text"])
+                        parent_span.set_attribute(
+                            "result", parsed_response["text"])
+                        llm_span.set_attribute(
+                            "result", parsed_response["text"])
 
             # Set LLM span status
             llm_span.set_status(Status(StatusCode.OK))
+    else:
+        # no modelInvocationOutput
+        print(
+            f"Warning: No modelInvocationOutput found in {parent_component} trace data")
+        # print(
+        #    f"Trace data: {json.dumps(component_trace, indent=2, default=str)}")
+        model_input = component_trace["modelInvocationInput"]
+        foundationModel = ""
+        if "foundationModel" in model_input:
+            if model_input["foundationModel"]:
+                foundationModel = model_input["foundationModel"]
+        span_no_modelInvocationInput = tracer.start_span(
+            name="no-modelInvocationOutput",
+            kind=SpanKind.CLIENT,
+            attributes={
+                SpanAttributes.OPERATION_NAME: SpanKindValues.DATABASE,
+                "trace.type": "KNOWLEDGE_BASE_LOOKUP-INVOCATION_INPUT",
+                 SpanAttributes.LLM_REQUEST_MODEL: parent_span.attributes.get(
+                     SpanAttributes.LLM_REQUEST_MODEL, "Not-Configured"
+                 ),
+                "foundationModel": foundationModel
+            },
+            context=trace.set_span_in_context(parent_span),
+        )
+        span_no_modelInvocationInput.start()
 
 
 def handle_rationale(
@@ -411,7 +458,8 @@ def handle_rationale(
     start_time, end_time, duration = timer.check_start_time(
         "rationale", trace_data, trace_id
     )
-    orchestration_trace = trace_data.get("trace", {}).get("orchestrationTrace", {})
+    orchestration_trace = trace_data.get(
+        "trace", {}).get("orchestrationTrace", {})
 
     if "rationale" in orchestration_trace:
         rationale_data = orchestration_trace["rationale"]
@@ -438,18 +486,39 @@ def handle_rationale(
             context=trace.set_span_in_context(span_parent),
         ) as rationale_span:
             # Add content
-            rationale_span.set_attribute(SpanAttributes.LLM_PROMPTS, "NotApplicable")
+            rationale_span.set_attribute(
+                SpanAttributes.LLM_PROMPTS, "NotApplicable")
             rationale_span.set_attribute(
                 SpanAttributes.LLM_COMPLETIONS, rationale_data.get("text", "")
             )
             rationale_span.set_status(Status(StatusCode.OK))
+    else:
+        # No rationale data found
+        logger.warning(
+            "No rationale data found in orchestration trace. Skipping rationale span creation."
+        )
+        span_no_rationale = tracer.start_span(
+            name="no-rationale",
+            kind=SpanKind.CLIENT,
+            attributes={
+                SpanAttributes.OPERATION_NAME: SpanKindValues.DATABASE,
+                "trace.type": "REASONING",
+                 SpanAttributes.LLM_REQUEST_MODEL: parent_span.attributes.get(
+                     SpanAttributes.LLM_REQUEST_MODEL, "Not-Configured"
+                 )
+            },
+            context=trace.set_span_in_context(parent_span),
+        )
+        span_no_rationale.start()
 
 
 def handle_knowledge_base(trace_data: Dict[str, Any], parent_span):
     """Handle knowledge base spans (input and output)"""
     trace_id = extract_trace_id(trace_data)
-    start_time, end_time, duration = timer.check_start_time("kb", trace_data, trace_id)
-    orchestration_trace = trace_data.get("trace", {}).get("orchestrationTrace", {})
+    start_time, end_time, duration = timer.check_start_time(
+        "kb", trace_data, trace_id)
+    orchestration_trace = trace_data.get(
+        "trace", {}).get("orchestrationTrace", {})
     kb_query = None
     # Handle knowledge base lookup input
     if (
@@ -480,6 +549,8 @@ def handle_knowledge_base(trace_data: Dict[str, Any], parent_span):
             context=trace.set_span_in_context(parent_span),  # Attach to parent
         )
 
+        # print(
+        #    f"Knowledge Base Lookup Input Span (semantic): {kb_span}, Start Time: {start_time}, End Time: {end_time}, Duration: {duration}")
         # Start the span manually
         kb_span.start()
 
@@ -505,6 +576,27 @@ def handle_knowledge_base(trace_data: Dict[str, Any], parent_span):
         from .agent import active_spans
 
         active_spans["kb_span"] = kb_span
+    else:
+        print(
+            "Knowledge Base Lookup Output not found in orchestration trace, skipping span creation"
+        )
+        print(
+            f"Orchestration Trace: {json.dumps(orchestration_trace, indent=2, default=str)}")
+        logger.warning(
+            "KB span not found or not recording, creating a new one")
+        kb_span_not_found = tracer.start_span(
+            name="knowledgeBaseLookupInput-no-invocationInput",
+            kind=SpanKind.CLIENT,
+            attributes={
+                SpanAttributes.OPERATION_NAME: SpanKindValues.DATABASE,
+                "trace.type": "KNOWLEDGE_BASE_LOOKUP-INVOCATION_INPUT",
+                 SpanAttributes.LLM_REQUEST_MODEL: parent_span.attributes.get(
+                     SpanAttributes.LLM_REQUEST_MODEL, "Not-Configured"
+                 ),
+            },
+            context=trace.set_span_in_context(parent_span),
+        )
+        kb_span_not_found.start()
 
     # Handle knowledge base lookup output
     if (
@@ -521,7 +613,8 @@ def handle_knowledge_base(trace_data: Dict[str, Any], parent_span):
             or not kb_span.is_recording()
         ):
             # If somehow we don't have a valid kb_span, we'll need to create one
-            logger.warning("KB span not found or not recording, creating a new one")
+            logger.warning(
+                "KB span not found or not recording, creating a new one")
             kb_span = tracer.start_span(
                 name="knowledgeBaseLookupInput",
                 kind=SpanKind.CLIENT,
@@ -534,6 +627,8 @@ def handle_knowledge_base(trace_data: Dict[str, Any], parent_span):
                 },
                 context=trace.set_span_in_context(parent_span),
             )
+            print(
+                f"Knowledge Base Lookup Input Span: {kb_span}, Start Time: {start_time}, End Time: {end_time}, Duration: {duration}")
             kb_span.start()
 
         # Create L4 results span as a child of knowledgeBase span
@@ -581,7 +676,8 @@ def handle_knowledge_base(trace_data: Dict[str, Any], parent_span):
         kb_span.set_attribute(
             "kb.result_count", len(kb_output.get("retrievalResults", []))
         )
-        kb_span.set_attribute("kb.total_tokens", kb_output.get("totalTokens", 0))
+        kb_span.set_attribute(
+            "kb.total_tokens", kb_output.get("totalTokens", 0))
 
         kb_span.set_status(Status(StatusCode.OK))
 
@@ -590,6 +686,27 @@ def handle_knowledge_base(trace_data: Dict[str, Any], parent_span):
 
         # Clear the reference
         active_spans["kb_span"] = None
+    else:
+        print(
+            "Knowledge Base Lookup Output not found in orchestration trace, skipping span creation"
+        )
+        print(
+            f"Orchestration Trace: {json.dumps(orchestration_trace, indent=2, default=str)}")
+        logger.warning(
+            "KB span not found or not recording, creating a new one")
+        kb_span_not_found = tracer.start_span(
+            name="knowledgeBaseLookupInput-invocationInput",
+            kind=SpanKind.CLIENT,
+            attributes={
+                SpanAttributes.OPERATION_NAME: SpanKindValues.DATABASE,
+                "trace.type": "KNOWLEDGE_BASE_LOOKUP-INVOCATION_INPUT",
+                 SpanAttributes.LLM_REQUEST_MODEL: parent_span.attributes.get(
+                     SpanAttributes.LLM_REQUEST_MODEL, "Not-Configured"
+                 ),
+            },
+            context=trace.set_span_in_context(parent_span),
+        )
+        kb_span_not_found.start()
 
 
 def handle_action_group(trace_data: Dict[str, Any], parent_span):
@@ -598,7 +715,8 @@ def handle_action_group(trace_data: Dict[str, Any], parent_span):
     start_time, end_time, duration = timer.check_start_time(
         "action_group", trace_data, trace_id
     )
-    orchestration_trace = trace_data.get("trace", {}).get("orchestrationTrace", {})
+    orchestration_trace = trace_data.get(
+        "trace", {}).get("orchestrationTrace", {})
 
     # Handle action group input - using correct field name: actionGroupInvocationInput
     if (
@@ -629,7 +747,9 @@ def handle_action_group(trace_data: Dict[str, Any], parent_span):
             context=trace.set_span_in_context(parent_span),
         )
         # Start the span manually
-        action_span.start()
+        # print(
+        #    f"Action Group Span (action_input.get()): {action_span}, Start Time: {start_time}, End Time: {end_time}, Duration: {duration}")
+        # action_span.start()
 
         # Add additional metadata
         set_span_attributes(
@@ -654,6 +774,27 @@ def handle_action_group(trace_data: Dict[str, Any], parent_span):
         from .agent import active_spans
 
         active_spans["action_span"] = action_span
+    else:
+        print(
+            "Knowledge Base Lookup Output not found in orchestration trace, skipping span creation"
+        )
+        print(
+            f"Orchestration Trace: {json.dumps(orchestration_trace, indent=2, default=str)}")
+        logger.warning(
+            "KB span not found or not recording, creating a new one")
+        kb_span_not_found = tracer.start_span(
+            name="ActionGroup-no-invocationInput",
+            kind=SpanKind.CLIENT,
+            attributes={
+                SpanAttributes.OPERATION_NAME: SpanKindValues.DATABASE,
+                "trace.type": "KNOWLEDGE_BASE_LOOKUP-INVOCATION_INPUT",
+                 SpanAttributes.LLM_REQUEST_MODEL: parent_span.attributes.get(
+                     SpanAttributes.LLM_REQUEST_MODEL, "Not-Configured"
+                 ),
+            },
+            context=trace.set_span_in_context(parent_span),
+        )
+        kb_span_not_found.start()
 
     # Handle action group output - using correct field name: actionGroupInvocationOutput
     if (
@@ -691,6 +832,8 @@ def handle_action_group(trace_data: Dict[str, Any], parent_span):
                 },
                 context=trace.set_span_in_context(parent_span),
             )
+            print(
+                f"Action Group Span (ACTION_GROUP): {action_span}, Start Time: {start_time}, End Time: {end_time}, Duration: {duration}")
             action_span.start()
 
         # Create L4 result span as child of action_group
@@ -707,7 +850,8 @@ def handle_action_group(trace_data: Dict[str, Any], parent_span):
         ) as result_span:
             # Add response content
             if "text" in action_output:
-                result_span.set_attribute(SpanAttributes.LLM_PROMPTS, "NotApplicable")
+                result_span.set_attribute(
+                    SpanAttributes.LLM_PROMPTS, "NotApplicable")
                 result_span.set_attribute(
                     SpanAttributes.LLM_COMPLETIONS, action_output["text"]
                 )
@@ -720,6 +864,27 @@ def handle_action_group(trace_data: Dict[str, Any], parent_span):
 
         # Clear the reference
         active_spans["action_span"] = None
+    else:
+        print(
+            "Knowledge Base Lookup Output not found in orchestration trace, skipping span creation"
+        )
+        print(
+            f"Orchestration Trace: {json.dumps(orchestration_trace, indent=2, default=str)}")
+        logger.warning(
+            "KB span not found or not recording, creating a new one")
+        kb_span_not_found = tracer.start_span(
+            name="ActionGroup-no-observation",
+            kind=SpanKind.CLIENT,
+            attributes={
+                SpanAttributes.OPERATION_NAME: SpanKindValues.DATABASE,
+                "trace.type": "KNOWLEDGE_BASE_LOOKUP-INVOCATION_INPUT",
+                 SpanAttributes.LLM_REQUEST_MODEL: parent_span.attributes.get(
+                     SpanAttributes.LLM_REQUEST_MODEL, "Not-Configured"
+                 ),
+            },
+            context=trace.set_span_in_context(parent_span),
+        )
+        kb_span_not_found.start()
 
 
 def handle_code_interpreter(trace_data: Dict[str, Any], parent_span):
@@ -728,7 +893,8 @@ def handle_code_interpreter(trace_data: Dict[str, Any], parent_span):
     start_time, end_time, duration = timer.check_start_time(
         "CodeInterpreter", trace_data, trace_id
     )
-    orchestration_trace = trace_data.get("trace", {}).get("orchestrationTrace", {})
+    orchestration_trace = trace_data.get(
+        "trace", {}).get("orchestrationTrace", {})
 
     # Handle code interpreter input
     # Using correct field name: codeInterpreterInvocationInput
@@ -763,6 +929,8 @@ def handle_code_interpreter(trace_data: Dict[str, Any], parent_span):
         )
 
         # Start the span manually
+        print(
+            f"Code Interpreter Span: {code_span}, Start Time: {start_time}, End Time: {end_time}, Duration: {duration}")
         code_span.start()
 
         # Add code as an attribute
@@ -812,6 +980,8 @@ def handle_code_interpreter(trace_data: Dict[str, Any], parent_span):
                 },
                 context=trace.set_span_in_context(parent_span),
             )
+            print(
+                f"Code Interpreter Span: {code_span}, Start Time: {start_time}, End Time: {end_time}, Duration: {duration}")
             code_span.start()
 
         # Create L4 result span as child of code_interpreter
@@ -844,8 +1014,10 @@ def handle_code_interpreter(trace_data: Dict[str, Any], parent_span):
 
             # Add error message if there was one
             if "errorMessage" in code_output and code_output["errorMessage"]:
-                result_span.set_attribute("errorMessage", code_output["errorMessage"])
-                code_span.set_attribute("errorMessage", code_output["errorMessage"])
+                result_span.set_attribute(
+                    "errorMessage", code_output["errorMessage"])
+                code_span.set_attribute(
+                    "errorMessage", code_output["errorMessage"])
 
             result_span.set_status(Status(StatusCode.OK))
 
@@ -858,6 +1030,7 @@ def handle_code_interpreter(trace_data: Dict[str, Any], parent_span):
         # Clear the reference
         active_spans["code_span"] = None
 
+
 def process_guardrail_buffer(guardrail_buffer: Dict[str, list], parent_span):
     """Process buffered guardrail events for streaming responses"""
     # Process each unique base trace ID
@@ -868,11 +1041,13 @@ def process_guardrail_buffer(guardrail_buffer: Dict[str, list], parent_span):
         # Get the first event to extract common information
         first_event = events[0]
         first_trace_data = first_event["trace_data"]
-        guardrail_trace = first_trace_data.get("trace", {}).get("guardrailTrace", {})
+        guardrail_trace = first_trace_data.get(
+            "trace", {}).get("guardrailTrace", {})
         action = guardrail_trace.get("action", "NONE")
 
         # Get first and last timestamp
-        first_timestamp = first_event.get("timestamp", datetime.now().isoformat())
+        first_timestamp = first_event.get(
+            "timestamp", datetime.now().isoformat())
         last_timestamp = (
             events[-1].get("timestamp", datetime.now().isoformat())
             if events
@@ -904,7 +1079,8 @@ def process_guardrail_buffer(guardrail_buffer: Dict[str, list], parent_span):
 
             for event in events:
                 trace_data = event["trace_data"]
-                guardrail_event = trace_data.get("trace", {}).get("guardrailTrace", {})
+                guardrail_event = trace_data.get(
+                    "trace", {}).get("guardrailTrace", {})
                 assessments = guardrail_event.get("outputAssessments", [])
 
                 # Check if this assessment has content
@@ -925,7 +1101,8 @@ def process_guardrail_buffer(guardrail_buffer: Dict[str, list], parent_span):
             # Only create assessment span if we have substantive content
             if has_substantive_assessment:
                 guardrail_span.set_attribute(
-                    "guardrail.output_assessments", json.dumps(combined_assessments)
+                    "guardrail.output_assessments", json.dumps(
+                        combined_assessments)
                 )
 
                 # Create a single assessment span with combined content
@@ -972,7 +1149,8 @@ def process_guardrail_buffer(guardrail_buffer: Dict[str, list], parent_span):
                         if "sensitiveInformationPolicy" in assessment:
                             assessment_span.set_attribute(
                                 f"{prefix}sensitive_info_policy",
-                                json.dumps(assessment["sensitiveInformationPolicy"]),
+                                json.dumps(
+                                    assessment["sensitiveInformationPolicy"]),
                             )
 
                     # Set status on assessment span
@@ -1045,7 +1223,8 @@ def handle_final_response(trace_data: Dict[str, Any], parent_span):
     start_time, end_time, duration = timer.check_start_time(
         "handle_final_response", trace_data, trace_id
     )
-    orchestration_trace = trace_data.get("trace", {}).get("orchestrationTrace", {})
+    orchestration_trace = trace_data.get(
+        "trace", {}).get("orchestrationTrace", {})
 
     if (
         "observation" in orchestration_trace
@@ -1080,7 +1259,8 @@ def handle_final_response(trace_data: Dict[str, Any], parent_span):
             # Add any metadata if available
             if "metadata" in final_response:
                 final_response_span.set_attribute(
-                    "response.metadata", json.dumps(final_response["metadata"])
+                    "response.metadata", json.dumps(
+                        final_response["metadata"], default=str)
                 )
 
             # Set status to OK
@@ -1149,7 +1329,8 @@ def handle_guardrail_intervention(trace_data: Dict[str, Any], parent_span):
                 ):
                     for word in assessment["wordPolicy"]["customWords"]:
                         if word.get("action") == "BLOCKED" and "match" in word:
-                            blocked_items.append(f"Word '{word['match']}' blocked")
+                            blocked_items.append(
+                                f"Word '{word['match']}' blocked")
 
         if blocked_items:
             guardrail_span.set_attribute(
@@ -1165,8 +1346,10 @@ def handle_standard_preprocessing(trace_data: Dict[str, Any], parent_span):
     start_time, end_time, duration = timer.check_start_time(
         "handle_standard_preprocessing", trace_data, trace_id
     )
-    print("calling handle_standard_preprocessing", end_time, start_time, duration)
-    preprocessing_trace = trace_data.get("trace", {}).get("preProcessingTrace", {})
+    print("calling handle_standard_preprocessing",
+          end_time, start_time, duration)
+    preprocessing_trace = trace_data.get(
+        "trace", {}).get("preProcessingTrace", {})
 
     # Extract trace ID from preprocessing trace
     trace_id = "unknown"
@@ -1175,7 +1358,8 @@ def handle_standard_preprocessing(trace_data: Dict[str, Any], parent_span):
             "traceId", "unknown"
         )
     elif "modelInvocationInput" in preprocessing_trace:
-        trace_id = preprocessing_trace["modelInvocationInput"].get("traceId", "unknown")
+        trace_id = preprocessing_trace["modelInvocationInput"].get(
+            "traceId", "unknown")
 
     # Create L2 preprocessing span
     with tracer.start_as_current_span(
@@ -1244,7 +1428,8 @@ def handle_standard_preprocessing(trace_data: Dict[str, Any], parent_span):
             ) as llm_span:
                 llm_span.set_attributes(
                     SpanAttributes.LLM_PROMPTS,
-                    preprocessing_span.attributes.get(SpanAttributes.LLM_PROMPTS),
+                    preprocessing_span.attributes.get(
+                        SpanAttributes.LLM_PROMPTS),
                 )
                 # Add token usage information
                 if "metadata" in model_output and "usage" in model_output["metadata"]:
@@ -1274,9 +1459,12 @@ def handle_standard_preprocessing(trace_data: Dict[str, Any], parent_span):
 
                 # Add raw response to LLM span
                 if "rawResponse" in model_output:
-                    raw_content = model_output["rawResponse"].get("content", "")
-                    llm_span.set_attribute(SpanAttributes.LLM_COMPLETIONS, raw_content)
-                    preprocessing_span.set_attribute("model.output", raw_content)
+                    raw_content = model_output["rawResponse"].get(
+                        "content", "")
+                    llm_span.set_attribute(
+                        SpanAttributes.LLM_COMPLETIONS, raw_content)
+                    preprocessing_span.set_attribute(
+                        "model.output", raw_content)
 
                 # Create L4 assessment span as child of LLM span
                 with tracer.start_as_current_span(
@@ -1291,23 +1479,28 @@ def handle_standard_preprocessing(trace_data: Dict[str, Any], parent_span):
                 ) as assessment_span:
                     # Add raw response
                     if "rawResponse" in model_output:
-                        raw_content = model_output["rawResponse"].get("content", "")
-                        assessment_span.set_attribute("rawResponse", raw_content)
+                        raw_content = model_output["rawResponse"].get(
+                            "content", "")
+                        assessment_span.set_attribute(
+                            "rawResponse", raw_content)
                         assessment_span.set_attribute("output", raw_content)
 
                     # Add metadata
                     if "metadata" in model_output:
                         metadata = model_output["metadata"]
-                        assessment_span.set_attribute("metadata", json.dumps(metadata))
+                        assessment_span.set_attribute(
+                            "metadata", json.dumps(metadata))
 
                         # Add token usage directly
                         if "usage" in metadata:
                             usage = metadata["usage"]
                             assessment_span.set_attribute(
-                                "usage.inputTokens", usage.get("inputTokens", 0)
+                                "usage.inputTokens", usage.get(
+                                    "inputTokens", 0)
                             )
                             assessment_span.set_attribute(
-                                "usage.outputTokens", usage.get("outputTokens", 0)
+                                "usage.outputTokens", usage.get(
+                                    "outputTokens", 0)
                             )
 
                     # Add parsed response
@@ -1331,7 +1524,8 @@ def handle_standard_preprocessing(trace_data: Dict[str, Any], parent_span):
                         if is_valid:
                             assessment_span.set_status(Status(StatusCode.OK))
                         else:
-                            assessment_span.set_status(Status(StatusCode.ERROR))
+                            assessment_span.set_status(
+                                Status(StatusCode.ERROR))
                             assessment_span.set_attribute(
                                 "error.message", "Invalid input in preprocessing"
                             )
@@ -1398,6 +1592,7 @@ def handle_guardrail_pre(trace_data: Dict[str, Any], parent_span):
         else:
             guardrail_pre_span.set_status(Status(StatusCode.OK))
 
+
 def handle_guardrail_post(trace_data: Dict[str, Any], parent_span):
     """Handle post-guardrail trace events with proper L2-L3 hierarchy (no LLM spans)"""
     trace_id = extract_trace_id(trace_data)
@@ -1458,11 +1653,13 @@ def handle_guardrail_post(trace_data: Dict[str, Any], parent_span):
                     # Add policy details
                     if "contentPolicy" in assessment:
                         assessment_span.set_attribute(
-                            "content_policy", json.dumps(assessment["contentPolicy"])
+                            "content_policy", json.dumps(
+                                assessment["contentPolicy"])
                         )
                     if "topicPolicy" in assessment:
                         assessment_span.set_attribute(
-                            "topic_policy", json.dumps(assessment["topicPolicy"])
+                            "topic_policy", json.dumps(
+                                assessment["topicPolicy"])
                         )
                     if "wordPolicy" in assessment:
                         assessment_span.set_attribute(
@@ -1471,7 +1668,8 @@ def handle_guardrail_post(trace_data: Dict[str, Any], parent_span):
                     if "sensitiveInformationPolicy" in assessment:
                         assessment_span.set_attribute(
                             "sensitive_info_policy",
-                            json.dumps(assessment["sensitiveInformationPolicy"]),
+                            json.dumps(
+                                assessment["sensitiveInformationPolicy"]),
                         )
 
                 # Set status on assessment span
@@ -1486,18 +1684,20 @@ def handle_guardrail_post(trace_data: Dict[str, Any], parent_span):
         else:
             guardrail_span.set_status(Status(StatusCode.OK))
 
+
 def handle_user_input_span(trace_data: Dict[str, Any], parent_span):
     """Handle user input as a tool invocation"""
     trace_id = extract_trace_id(trace_data)
     start_time, end_time, duration = timer.check_start_time(
         "handle_user_input", trace_data, trace_id
     )
-    
+
     # Extract observation data containing user question
-    obs = trace_data.get("trace", {}).get("orchestrationTrace", {}).get("observation", {})
+    obs = trace_data.get("trace", {}).get(
+        "orchestrationTrace", {}).get("observation", {})
     final_response = obs.get('finalResponse', {})
     question_text = final_response.get('text', '')
-    
+
     # Create user input span
     with tracer.start_as_current_span(
         name="askUser",
@@ -1528,12 +1728,13 @@ def handle_user_input_span(trace_data: Dict[str, Any], parent_span):
                 user_input_span.set_attribute(
                     "response.metadata", json.dumps(final_response["metadata"])
                 )
-            
+
             if "ask_user_metadata" in obs:
                 user_input_span.set_attribute(
                     "ask_user.metadata", json.dumps(obs["ask_user_metadata"])
                 )
         user_input_span.set_status(Status(StatusCode.OK))
+
 
 def handle_file_operations(trace_data: Dict[str, Any], parent_span):
     """Handle file operations in the trace"""
@@ -1541,14 +1742,14 @@ def handle_file_operations(trace_data: Dict[str, Any], parent_span):
     start_time, end_time, duration = timer.check_start_time(
         "handle_file_operations", trace_data, trace_id
     )
-    
+
     # Extract files data
     files_event = trace_data.get("files", {})
     if not files_event or "files" not in files_event:
         return
-    
+
     files_list = files_event.get("files", [])
-    
+
     # Create file processing span
     with tracer.start_as_current_span(
         name="file_processing",
@@ -1565,29 +1766,32 @@ def handle_file_operations(trace_data: Dict[str, Any], parent_span):
     ) as file_span:
         # Process individual files
         for idx, this_file in enumerate(files_list):
-            file_span.set_attribute(f"file.{idx}.name", this_file.get("name", ""))
-            file_span.set_attribute(f"file.{idx}.type", this_file.get("type", ""))
-            file_span.set_attribute(f"file.{idx}.size", this_file.get("size", 0))
-            
+            file_span.set_attribute(
+                f"file.{idx}.name", this_file.get("name", ""))
+            file_span.set_attribute(
+                f"file.{idx}.type", this_file.get("type", ""))
+            file_span.set_attribute(
+                f"file.{idx}.size", this_file.get("size", 0))
+
             # Add metadata if available
             if "metadata" in this_file:
                 file_span.set_attribute(
                     f"file.{idx}.metadata",
                     json.dumps(this_file["metadata"])
                 )
-            
+
             # Add content info if available
             if "content" in this_file:
                 content_info = this_file["content"]
                 if isinstance(content_info, dict):
                     file_span.set_attribute(
-                        f"file.{idx}.content_type", 
+                        f"file.{idx}.content_type",
                         content_info.get("content_type", "")
                     )
-                    
+
                     if "size" in content_info:
                         file_span.set_attribute(
-                            f"file.{idx}.content_size", 
+                            f"file.{idx}.content_size",
                             content_info["size"]
                         )
         file_span.set_status(Status(StatusCode.OK))

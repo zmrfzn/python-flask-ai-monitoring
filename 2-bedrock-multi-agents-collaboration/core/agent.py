@@ -21,14 +21,18 @@ logger = logging.getLogger(__name__)
 # Initialize OpenTelemetry global tracer
 tracer = trace.get_tracer("bedrock-agent-tracing")
 
+
 class DateTimeEncoder(json.JSONEncoder):
     """Helper class to serialize datetime objects to JSON."""
+
     def default(self, obj):
         if isinstance(obj, datetime):
             return obj.isoformat()
         return super().default(obj)
-    
+
 # Class to manage spans during processing
+
+
 class SpanManager:
     """Manages spans and their relationships for the duration of processing."""
 
@@ -107,7 +111,10 @@ class SpanManager:
     ):
         span_key = f"{component_type}:{trace_id}"
 
-        # Check existing span
+        if not parent_span:
+            logger.info("No parent span provided, cannot create child span.")
+
+            # Check existing span
         if span_key in self.spans and self.spans[span_key].is_recording():
             span = self.spans[span_key]
 
@@ -118,8 +125,10 @@ class SpanManager:
                     span.set_attribute(
                         SpanAttributes.SPAN_START_TIME, start_time_iso
                     )
-                    span.set_attribute(SpanAttributes.SPAN_END_TIME, end_time_iso)
-                    span.set_attribute(SpanAttributes.SPAN_DURATION, latency_ms)
+                    span.set_attribute(
+                        SpanAttributes.SPAN_END_TIME, end_time_iso)
+                    span.set_attribute(
+                        SpanAttributes.SPAN_DURATION, latency_ms)
                     self.protect_span_timing(span_key)
 
             return span
@@ -134,6 +143,7 @@ class SpanManager:
 
         # Start the span only if it's not already recording
         if not span.is_recording():
+            print(f"Span {span_key} is not recording, starting it now.")
             span.start()
 
         # Set timing data if provided
@@ -142,7 +152,8 @@ class SpanManager:
 
             # Only set if values are valid
             if start_time_iso and end_time_iso:
-                span.set_attribute(SpanAttributes.SPAN_START_TIME, start_time_iso)
+                span.set_attribute(
+                    SpanAttributes.SPAN_START_TIME, start_time_iso)
                 span.set_attribute(SpanAttributes.SPAN_END_TIME, end_time_iso)
                 span.set_attribute(SpanAttributes.SPAN_DURATION, latency_ms)
 
@@ -240,6 +251,7 @@ def extract_trace_id(trace_data: Dict[str, Any], component_type: str = None) -> 
                 "traceId", f"guardrail-{time.time()}"
             )
         else:
+            print(f"Unknown component type: {component_type}")
             component_trace = {}
     else:
         # Try to infer component type from trace object
@@ -256,6 +268,7 @@ def extract_trace_id(trace_data: Dict[str, Any], component_type: str = None) -> 
         elif "failureTrace" in trace_obj:
             return trace_obj["failureTrace"].get("traceId", f"failure-{time.time()}")
         else:
+            print(f"Unknown component trace: {trace_obj}")
             component_trace = {}
 
     # Try to extract from modelInvocation fields first
@@ -292,6 +305,12 @@ def process_trace_event(trace_data: Dict[str, Any], parent_span):
         parent_span: The parent span for this trace event
     """
     from .handlers import handle_file_operations
+
+    # print(f"Processing trace data: {trace_data}")
+    # print parent_span if it exists
+    if not parent_span:
+        logger.info("No parent span provided")
+
     # Capture receive time if not already present
     if "received_timestamp" not in trace_data:
         received_timestamp = time.time()
@@ -302,7 +321,7 @@ def process_trace_event(trace_data: Dict[str, Any], parent_span):
         )
         trace_data["received_timestamp"] = received_timestamp
         trace_data["received_time_iso"] = received_time_iso
-    
+
     if "files" in trace_data:
         handle_file_operations(trace_data, parent_span)
 
@@ -465,7 +484,8 @@ def instrument_agent_invocation(func):
                 root_span.set_attribute(
                     "invoke_complete_time_iso", invoke_complete_time_iso
                 )
-                root_span.set_attribute("invoke_duration_ms", invoke_duration_ms)
+                root_span.set_attribute(
+                    "invoke_duration_ms", invoke_duration_ms)
 
                 # Handle streaming vs non-streaming differently
                 if (
@@ -539,14 +559,16 @@ def instrument_agent_invocation(func):
 
                             # Save trace logs if requested
                             if show_traces:
-                                logger.info(f"Trace event: {trace_data}")   
+                                logger.info(f"Trace event: {trace_data}")
                             if save_trace_logs:
                                 try:
                                     with open("trace_logs.json", "a") as f:
-                                        f.write(json.dumps(trace_data, cls=DateTimeEncoder))
+                                        f.write(json.dumps(
+                                            trace_data, cls=DateTimeEncoder))
                                         f.write("\n---\n")
                                 except Exception as e:
-                                    logger.error(f"Failed to write trace logs: {str(e)}")
+                                    logger.error(
+                                        f"Failed to write trace logs: {str(e)}")
 
                             # Process trace events through our central processor
                             try:
@@ -560,7 +582,8 @@ def instrument_agent_invocation(func):
                     # End processing time
                     processing_end_timestamp, processing_end_time_iso = get_time()
                     processing_duration_ms = round(
-                        (processing_end_timestamp - processing_start_timestamp) * 1000,
+                        (processing_end_timestamp -
+                         processing_start_timestamp) * 1000,
                         2,
                     )
                     root_span.set_attribute(
@@ -575,7 +598,8 @@ def instrument_agent_invocation(func):
                         traces_window_ms = round(
                             (all_traces_end_time - all_traces_start_time) * 1000, 2
                         )
-                        root_span.set_attribute("traces_window_ms", traces_window_ms)
+                        root_span.set_attribute(
+                            "traces_window_ms", traces_window_ms)
 
                 # Add the extracted completion to the response
                 response["extracted_completion"] = extracted_completion
@@ -593,12 +617,15 @@ def instrument_agent_invocation(func):
 
                 # Set success status and end time - don't overwrite SPAN_START_TIME
                 end_timestamp, end_time_iso = get_time()
-                duration_ms = round((end_timestamp - start_timestamp) * 1000, 2)
+                duration_ms = round(
+                    (end_timestamp - start_timestamp) * 1000, 2)
 
                 # Set final metrics on root span
                 root_span.set_attribute("duration_ms", duration_ms)
-                root_span.set_attribute(SpanAttributes.SPAN_END_TIME, end_time_iso)
-                root_span.set_attribute(SpanAttributes.SPAN_DURATION, duration_ms)
+                root_span.set_attribute(
+                    SpanAttributes.SPAN_END_TIME, end_time_iso)
+                root_span.set_attribute(
+                    SpanAttributes.SPAN_DURATION, duration_ms)
                 root_span.set_attribute("total_time_ms", duration_ms)
                 root_span.set_status(Status(StatusCode.OK))
 
@@ -609,10 +636,12 @@ def instrument_agent_invocation(func):
                 root_span.set_attribute("error.message", str(e))
                 root_span.set_attribute("error.type", e.__class__.__name__)
                 root_span.set_status(Status(StatusCode.ERROR))
-                logger.error(f"Error during agent invocation: {str(e)}", exc_info=True)
+                logger.error(
+                    f"Error during agent invocation: {str(e)}", exc_info=True)
                 return {"error": str(e), "exception": str(e)}
 
     return wrapper
+
 
 def flush_telemetry():
     """Force flush OpenTelemetry data to ensure exports complete."""

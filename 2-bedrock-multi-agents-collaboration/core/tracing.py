@@ -1,6 +1,7 @@
 """
 Core tracing functionality for Bedrock Agent Langfuse integration.
 """
+from .constants import SpanAttributes
 import json
 import logging
 from datetime import datetime
@@ -10,6 +11,8 @@ from opentelemetry import trace
 from opentelemetry.trace import Status, StatusCode
 
 # Constants for document attributes to match OpenInference standards
+
+
 class DocumentAttributes:
     """Document attribute constants for OpenInference compatibility"""
 
@@ -18,7 +21,6 @@ class DocumentAttributes:
     DOCUMENT_CONTENT = "document.content"
     DOCUMENT_METADATA = "document.metadata"
 
-from .constants import SpanAttributes
 
 # Initialize logging
 logger = logging.getLogger(__name__)
@@ -33,7 +35,7 @@ class DateTimeEncoder(json.JSONEncoder):
         return super().default(obj)
 
 
-def get_tracer(tracer_name="bedrock-agent-langfuse"):
+def get_tracer(tracer_name="bedrock-agent-tracing"):
     """Get a tracer instance"""
     return trace.get_tracer(tracer_name)
 
@@ -110,7 +112,8 @@ def flush_telemetry():
         success = trace_provider.force_flush(timeout_millis=30000)
 
         if success:
-            logger.info("🟢 Telemetry data flushed successfully to OTLP endpoint")
+            logger.info(
+                "🟢 Telemetry data flushed successfully to OTLP endpoint")
         else:
             logger.warning(
                 "🔶 Telemetry flush timed out or failed - data may not have been sent completely"
@@ -128,6 +131,7 @@ def flush_telemetry():
                 try:
                     processor.force_flush(300)
                 except Exception as e:
-                    logger.warning(f"Error during explicit processor flush: {e}")
+                    logger.warning(
+                        f"Error during explicit processor flush: {e}")
     except Exception as e:
         logger.error(f"🔴 Error flushing telemetry: {str(e)}", exc_info=True)
