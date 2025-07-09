@@ -17,10 +17,12 @@ client = AzureOpenAI(
     api_key=subscription_key,
 )
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder="../templates",
+            static_folder="../static")
 
 # initialize the New Relic Python agent
 newrelic.agent.initialize('newrelic.ini')
+
 
 def chatCompletion(prompt):
     completion = client.chat.completions.create(
@@ -30,15 +32,18 @@ def chatCompletion(prompt):
         ])
     return completion.choices[0].message.content
 
+
 @app.route("/")
 def home():
     return render_template("index.html")
+
 
 @app.route("/prompt", methods=["POST"])
 def prompt():
     input_prompt = request.form.get("input")
     output_prompt = chatCompletion(input_prompt)
     return render_template("index.html", output=output_prompt)
+
 
 # make the server publicly available via port 5004
 # flask --app levelsix.py run --host 0.0.0.0 --port 5004

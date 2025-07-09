@@ -11,18 +11,21 @@ logger = logging.getLogger(__name__)
 
 openlit.init()
 
-#genai.configure(api_key=os.environ["API_KEY"])
+# genai.configure(api_key=os.environ["API_KEY"])
 # Only run this block for Gemini Developer API
 client = genai.Client(api_key=os.environ["API_KEY"])
 
 GEMINI_MODEL = "gemini-1.5-flash"
-#GEMINI_MODEL = "gemini-1.5-flash-8b"
-#GEMINI_MODEL = "gemini-1.5-pro"
-#GEMINI_MODEL = "gemini-1.0-pro"
+# GEMINI_MODEL = "gemini-1.5-flash-8b"
+# GEMINI_MODEL = "gemini-1.5-pro"
+# GEMINI_MODEL = "gemini-1.0-pro"
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder="../templates",
+            static_folder="../static")
 
-## taking the input from the user and returning the response from Gemini
+# taking the input from the user and returning the response from Gemini
+
+
 def chatCompletion(prompt):
     logger.info("prompt: "+prompt)
     response = client.models.generate_content(
@@ -32,15 +35,15 @@ def chatCompletion(prompt):
             temperature=1.0,
         ),
     )
-    #model = client.GenerativeModel(GEMINI_MODEL)
-    #generation_config=client.types.GenerationConfig(
+    # model = client.GenerativeModel(GEMINI_MODEL)
+    # generation_config=client.types.GenerationConfig(
     #    temperature=1.0,
-    #)
-    
-    #response = model.generate_content(
+    # )
+
+    # response = model.generate_content(
     #    prompt,
     #    generation_config=generation_config,
-    #)
+    # )
     logger.info(response)
     responseText = ""
     if response.candidates:
@@ -49,10 +52,12 @@ def chatCompletion(prompt):
                 responseText = response.candidates[0].content.parts[0].text
     return responseText
 
+
 @app.route("/")
 def home():
     logger.info("render index.html")
     return render_template("index.html")
+
 
 @app.route("/prompt", methods=["POST"])
 def prompt():
@@ -60,6 +65,7 @@ def prompt():
     input_prompt = request.form.get("input")
     output_prompt = chatCompletion(input_prompt)
     return render_template("index.html", output=output_prompt)
+
 
 # make the server publicly available via port 5004
 # flask --app levelsix.py run --host 0.0.0.0 --port 5004

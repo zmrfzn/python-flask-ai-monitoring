@@ -14,7 +14,8 @@ import markdown
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder="../templates",
+            static_folder="../static")
 
 # Read prompts from the prompts.txt file
 prompts = []

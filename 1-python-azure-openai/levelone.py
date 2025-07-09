@@ -14,10 +14,12 @@ client = AzureOpenAI(
     azure_endpoint=endpoint,
     api_key=subscription_key,
 )
-app = Flask(__name__)
+app = Flask(__name__, template_folder="../templates",
+            static_folder="../static")
 
 # using the same function we saw back in levelthree.py
 # taking the input from the user and returning the response from OpenAI
+
 
 def chatCompletion(prompt):
     print("prompt: "+prompt)
@@ -28,9 +30,11 @@ def chatCompletion(prompt):
         ])
     return completion.choices[0].message.content
 
+
 @app.route("/")
 def main():
     return render_template("index.html")
+
 
 @app.route("/prompt", methods=["POST"])
 def prompt():
@@ -38,6 +42,7 @@ def prompt():
     # call the function - chatCompletion and pass the input from the user
     output_prompt = chatCompletion(input_prompt)
     return render_template("index.html", output=output_prompt)
+
 
 # make the server publicly available via port 5002
 # flask --app levelfive.py run --host 0.0.0.0 --port 5002

@@ -21,10 +21,12 @@ from PIL import Image          # pillow, for processing image types
 from flask import Flask, render_template, request
 from openai import AzureOpenAI
 
+
 def old_package(version, minimum):  # Block old openai python libraries before today's
     version_parts = list(map(int, version.split(".")))
     minimum_parts = list(map(int, minimum.split(".")))
     return version_parts < minimum_parts
+
 
 if old_package(openai.__version__, "1.2.3"):
     raise ValueError(f"Error: OpenAI version {openai.__version__}"
@@ -47,10 +49,12 @@ app = Flask(__name__)
 # initialize the New Relic Python agent
 newrelic.agent.initialize('newrelic.ini')
 
+
 def chatCompletion(prompt):
     prompt = (
         f"Subject: {prompt} "  # use the space at end
-        "Style: romantic impressionist painting."     # this is implicit line continuation
+        # this is implicit line continuation
+        "Style: romantic impressionist painting."
     )
 
     image_params = {
@@ -62,9 +66,10 @@ def chatCompletion(prompt):
         "quality": "hd",      # quality at 2x the price, defaults to "standard"
     }
 
-    ## -- You can uncomment the lines below to include these non-default parameters --
+    # -- You can uncomment the lines below to include these non-default parameters --
 
-    image_params.update({"response_format": "b64_json"})  # defaults to "url" for separate download
+    # defaults to "url" for separate download
+    image_params.update({"response_format": "b64_json"})
 
     # ---- START
     # here's the actual request to API and lots of error catching
@@ -88,7 +93,8 @@ def chatCompletion(prompt):
 
     # make a file name prefix from date-time of response
     images_dt = datetime.utcfromtimestamp(images_response.created)
-    img_filename = images_dt.strftime('DALLE-%Y%m%d_%H%M%S')  # like 'DALLE-20231111_144356'
+    img_filename = images_dt.strftime(
+        'DALLE-%Y%m%d_%H%M%S')  # like 'DALLE-20231111_144356'
     img_filename_full = img_filename
 
     # get the prompt used if rewritten by dall-e-3, null if unchanged by AI
@@ -113,29 +119,34 @@ def chatCompletion(prompt):
                 try:
                     print(f"getting URL: {url}")
                     response = requests.get(url)
-                    response.raise_for_status()  # Raises stored HTTPError, if one occurred.
+                    # Raises stored HTTPError, if one occurred.
+                    response.raise_for_status()
                 except requests.HTTPError as e:
-                    print(f"Failed to download image from {url}. Error: {e.response.status_code}")
-                    retry = input("Retry? (y/n): ")  # ask script user if image url is bad
+                    print(
+                        f"Failed to download image from {url}. Error: {e.response.status_code}")
+                    # ask script user if image url is bad
+                    retry = input("Retry? (y/n): ")
                     if retry.lower() in ["n", "no"]:  # could wait a bit if not ready
                         raise
                     else:
                         continue
                 break
-            image_objects.append(Image.open(BytesIO(response.content)))  # Append the Image object to the list
+            # Append the Image object to the list
+            image_objects.append(Image.open(BytesIO(response.content)))
             img_filename_full = f"{img_filename}_{i}.png"
             image_objects[i].save(f"static/{img_filename_full}")
             print(f"{img_filename_full} was saved")
     elif image_data_list and all(image_data_list):  # if there is b64 data
         # Convert "b64_json" data to png file
         for i, data in enumerate(image_data_list):
-            image_objects.append(Image.open(BytesIO(base64.b64decode(data))))  # Append the Image object to the list
+            # Append the Image object to the list
+            image_objects.append(Image.open(BytesIO(base64.b64decode(data))))
             image_objects[i].save(f"static/{img_filename}_{i}.png")
             print(f"{img_filename}_{i}.png was saved")
     else:
         print("No image data was obtained. Maybe bad code?")
 
-    ## -- extra fun: pop up some thumbnails in your GUI if you want to see what was saved
+    # -- extra fun: pop up some thumbnails in your GUI if you want to see what was saved
 
     if image_objects:
         # Create a new window for each image
@@ -145,20 +156,21 @@ def chatCompletion(prompt):
                 img.thumbnail((512, 512))  # Resize while keeping aspect ratio
 
             # Create a new tkinter window
-            #window = tk.Tk()
-            #window.title(f"Image {i}")
+            # window = tk.Tk()
+            # window.title(f"Image {i}")
 
             # Convert PIL Image object to PhotoImage object
-            #tk_image = ImageTk.PhotoImage(img)
+            # tk_image = ImageTk.PhotoImage(img)
 
             # Create a label and add the image to it
-            #label = tk.Label(window, image=tk_image)
-            #label.pack()
+            # label = tk.Label(window, image=tk_image)
+            # label.pack()
 
             # Run the tkinter main loop - this will block the script until images are closed
-            #window.mainloop()
+            # window.mainloop()
 
     return img_filename_full
+
 
 @app.route("/")
 def home():
@@ -176,4 +188,3 @@ def prompt():
 # flask --app levelsix.py run --host 0.0.0.0 --port 5004
 if __name__ == '__main__':
     app.run(host="0.0.0.0", debug=True, port=5004)
-

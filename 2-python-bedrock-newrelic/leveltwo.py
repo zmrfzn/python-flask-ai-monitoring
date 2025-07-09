@@ -26,7 +26,8 @@ model_id = "amazon.titan-text-lite-v1"
 # model_id = "deepseek.r1-v1:0"
 # model_id="amazon.nova-micro-v1:0"
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder="../templates",
+            static_folder="../static")
 
 # taking the input from the user and returning the response from Gemini
 

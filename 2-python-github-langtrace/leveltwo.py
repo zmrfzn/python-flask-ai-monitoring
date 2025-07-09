@@ -15,7 +15,8 @@ client = OpenAI(
 
 model_id = os.environ["MODEL"]  # e.g. "gpt-4o-mini"
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder="../templates",
+            static_folder="../static")
 
 # Read prompts from the prompts.txt file
 prompts = []

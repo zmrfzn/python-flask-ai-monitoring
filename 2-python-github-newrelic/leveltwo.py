@@ -12,7 +12,8 @@ client = OpenAI(
 
 model_id = os.environ["MODEL"]  # e.g. "gpt-4o-mini"
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder="../templates",
+            static_folder="../static")
 
 # initialize the New Relic Python agent
 newrelic.agent.initialize('newrelic.ini')

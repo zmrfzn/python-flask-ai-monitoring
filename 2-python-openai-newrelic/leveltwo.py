@@ -10,10 +10,12 @@ client = OpenAI(
     api_key=os.environ.get("OPENAI_API_KEY"),
 )
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder="../templates",
+            static_folder="../static")
 
 # initialize the New Relic Python agent
 newrelic.agent.initialize('newrelic.ini')
+
 
 def chatCompletion(prompt):
     completion = client.chat.completions.create(
@@ -25,9 +27,11 @@ def chatCompletion(prompt):
         ])
     return completion.choices[0].message.content
 
+
 @app.route("/")
 def home():
     return render_template("index.html")
+
 
 @app.route("/prompt", methods=["POST"])
 def prompt():
@@ -35,6 +39,7 @@ def prompt():
     output_prompt = chatCompletion(input_prompt)
     html_output = markdown.markdown(output_prompt)
     return render_template("index.html", output=html_output)
+
 
 # make the server publicly available via port 5004
 # flask --app levelsix.py run --host 0.0.0.0 --port 5004
