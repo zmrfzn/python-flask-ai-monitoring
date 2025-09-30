@@ -10,18 +10,28 @@ client = OpenAI(
     api_key=os.environ.get("OPENAI_API_KEY"),
 )
 
+model_id = os.environ["MODEL"]  # e.g. "gpt-4o-mini"
+
 app = Flask(__name__, template_folder="../templates",
             static_folder="../static")
 
 # initialize the New Relic Python agent
 newrelic.agent.initialize('newrelic.ini')
 
+# Read prompts from the prompts.txt file
+prompts = []
+try:
+    with open("../prompts.txt", "r") as file:
+        # Skip lines that are empty or comments (starting with //)
+        prompts = [line.strip() for line in file if line.strip()
+                   and not line.startswith("//")]
+except Exception as e:
+    print(f"Error reading prompts file: {e}")
+
 
 def chatCompletion(prompt):
     completion = client.chat.completions.create(
-        model="gpt-3.5-turbo",
-        temperature=0.8,
-        max_tokens=256,
+        model=model_id,
         messages=[
             {"role": "user", "content": prompt}
         ])
@@ -30,7 +40,7 @@ def chatCompletion(prompt):
 
 @app.route("/")
 def home():
-    return render_template("index.html")
+    return render_template("index.html", prompts=prompts)
 
 
 @app.route("/prompt", methods=["POST"])
@@ -38,7 +48,7 @@ def prompt():
     input_prompt = request.form.get("input")
     output_prompt = chatCompletion(input_prompt)
     html_output = markdown.markdown(output_prompt)
-    return render_template("index.html", output=html_output)
+    return render_template("index.html", input=input_prompt, output=html_output, prompts=prompts)
 
 
 # make the server publicly available via port 5004
