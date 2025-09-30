@@ -1,8 +1,10 @@
 response.model,cost-input,cost-input-tokens,cost-output,cost-output-tokens,vendor
 gpt-3.5-turbo-0125,0.50,1000000,1.50,1000000,OpenAI
+gpt-4-0613,3.00,1000000,7.00,1000000,OpenAI
 gpt-4-turbo-2024-04-09,10.00,1000000,30.00,1000000,OpenAI
 gpt-4o-2024-05-13,5.00,1000000,15.00,1000000,OpenAI
 gpt-4o,2.50,1000000,10.00,1000000,OpenAI
+gpt-4o-2024-11-20,2.50,1000000,10.00,1000000,OpenAI
 gpt-4o-2024-08-06,2.50,1000000,10.00,1000000,OpenAI
 gpt-4.1-mini,0.4,1000000,1.6,1000000,OpenAI
 gpt-4.1-mini-2025-04-14,0.4,1000000,1.6,1000000,OpenAI
