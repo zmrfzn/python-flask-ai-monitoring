@@ -1,34 +1,26 @@
 import os
 from openai import OpenAI
 from flask import Flask, render_template, request
-import markdown
 
 client = OpenAI(
+    base_url="https://api.relax.ai/v1/",
     # This is the default and can be omitted
-    api_key=os.environ.get("OPENAI_API_KEY"),
+    api_key=os.environ.get("RELAX_AI_API_KEY"),
 )
 
-model_id = os.environ["MODEL"]  # e.g. "gpt-4o-mini"
-
-template_dir = os.path.abspath('../')
 app = Flask(__name__, template_folder="../templates",
             static_folder="../static")
 
-# Read prompts from the prompts.txt file
-prompts = []
-try:
-    with open("../prompts.txt", "r") as file:
-        # Skip lines that are empty or comments (starting with //)
-        prompts = [line.strip() for line in file if line.strip()
-                   and not line.startswith("//")]
-except Exception as e:
-    print(f"Error reading prompts file: {e}")
+# using the same function we saw back in levelthree.py
+# taking the input from the user and returning the response from OpenAI
 
 
 def chatCompletion(prompt):
     print("prompt: "+prompt)
     completion = client.chat.completions.create(
-        model=model_id,
+        model="DeepSeek-R1-0528",
+        temperature=0.8,
+        max_tokens=256,
         messages=[
             {"role": "user", "content": prompt}
         ])
@@ -36,8 +28,8 @@ def chatCompletion(prompt):
 
 
 @app.route("/")
-def home():
-    return render_template("index.html", prompts=prompts)
+def main():
+    return render_template("index.html")
 
 
 @app.route("/prompt", methods=["POST"])
@@ -45,8 +37,7 @@ def prompt():
     input_prompt = request.form.get("input")
     # call the function - chatCompletion and pass the input from the user
     output_prompt = chatCompletion(input_prompt)
-    html_output = markdown.markdown(output_prompt)
-    return render_template("index.html", input=input_prompt, output=html_output, prompts=prompts)
+    return render_template("index.html", output=output_prompt)
 
 
 # make the server publicly available via port 5002
