@@ -6,8 +6,7 @@ import urllib.parse
 from flask import Flask, render_template, jsonify, request, session
 import json
 
-app = Flask(__name__, template_folder="../templates",
-            static_folder="../static")
+app = Flask(__name__)
 app.secret_key = os.urandom(24)
 
 # initialize the New Relic Python agent
