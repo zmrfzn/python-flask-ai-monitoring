@@ -24,22 +24,28 @@ cp .env.example tools/.env
 Edit each `.env` to add your `OPENAI_API_KEY` (GitHub PAT with models.read). Optional: add `OPENWEATHER_API_KEY` for weather tool.
 
 ### 4. Run Services
-Start the tools server first (default port 8090):
+Each component ships with its own `.env` file in the corresponding directory.
+Start every process from that directory so environment variables are picked up:
+
+Tools MCP server (default port 8090):
 ```
-uv run mcp-test-tools
+cd tools
+uv run python tools_server.py
 ```
-In a second terminal start the API server (default port 8080):
+
+FastAPI chat server (default port 8080):
 ```
-uv run mcp-test-server
+cd server
+uv run python agent.py
 ```
-Optional Streamlit client (if present):
+
+Optional Streamlit client:
 ```
-uv run mcp-test-client
+cd client
+streamlit run client.py
 ```
-Or launch everything via helper:
-```
-uv run run-all
-```
+
+There is no consolidated `run-all` helper; launch each service in its own terminal.
 
 ### 5. Test Endpoint
 ```
