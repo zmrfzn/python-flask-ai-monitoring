@@ -74,8 +74,8 @@ def get_weather(city: str, ctx: Context) -> str:
     logger.debug("[get_weather] start", extra={"request_id": request_id, "city": city})
     api_key = os.getenv("OPENWEATHER_API_KEY")
     if not api_key:
-        logger.warning("[get_weather] missing API key", extra={"request_id": request_id})
-        return "Weather service not configured. Please set OPENWEATHER_API_KEY environment variable."
+        logger.error("[get_weather] missing API key", extra={"request_id": request_id})
+        raise ValueError("Weather service not configured. OPENWEATHER_API_KEY environment variable is required.")
     try:
         url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=metric"
         response = requests.get(url, timeout=5)
