@@ -15,7 +15,8 @@ Edit `server/.env` to configure the models:
 # Each request will use a different model from this list in rotation
 # NOTE: Only use models that support function calling (tools)
 # NOTE: Only use models available in GitHub Models API
-LLM_MODELS=gpt-4o-mini,gpt-4.1-mini,gpt-5-nano,gpt-5-mini,Mistral-Small-3.1
+# Valid models: gpt-4o-mini, gpt-4o
+LLM_MODELS=gpt-4o-mini,gpt-4o
 
 # Fallback if LLM_MODELS is not set
 LLM_MODEL=gpt-4o-mini
@@ -196,8 +197,8 @@ To modify the model list:
 Model rotation information appears in logs:
 
 ```
-[startup] Configured LLM models for rotation - models: gpt-4o-mini,gpt-4.1-mini,gpt-5-nano, model_count: 3
-[chat] Initializing OpenAIChatCompletionClient with model rotation - model: gpt-4o-mini, available_models: gpt-4o-mini,gpt-4.1-mini,gpt-5-nano
+[startup] Configured LLM models for rotation - models: gpt-4o-mini,gpt-4o, model_count: 2
+[chat] Initializing OpenAIChatCompletionClient with model rotation - model: gpt-4o-mini, available_models: gpt-4o-mini,gpt-4o
 ```
 
 ## Tips
