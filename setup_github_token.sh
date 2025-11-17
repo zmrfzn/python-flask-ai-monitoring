@@ -37,16 +37,6 @@ if [ -z "$github_token" ]; then
     exit 1
 fi
 
-# Validate token format (should start with ghp_, gho_, or ghs_)
-if [[ ! "$github_token" =~ ^gh[pso]_[A-Za-z0-9_]+ ]]; then
-    echo "Warning: Token doesn't match expected GitHub PAT format (ghp_*, gho_*, or ghs_*)"
-    read -p "Continue anyway? (y/N): " continue_anyway
-    if [[ ! "$continue_anyway" =~ ^[Yy]$ ]]; then
-        echo "Aborted."
-        exit 1
-    fi
-fi
-
 # Determine which shell config file to use
 SHELL_CONFIG=""
 if [ -n "$ZSH_VERSION" ] || [[ "$SHELL" == *"zsh"* ]]; then
