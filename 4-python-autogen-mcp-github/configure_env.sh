@@ -53,30 +53,40 @@ fi
 
 echo ""
 
-# Prompt for New Relic License Key
-echo "Enter your New Relic License Key:"
-echo "(Find it at: https://one.newrelic.com/launcher/api-keys-ui.api-keys-launcher)"
-read -p "License Key: " nr_license_key
-
-if [ -z "$nr_license_key" ]; then
-    echo "Error: New Relic License Key cannot be empty"
-    exit 1
+# Check for New Relic License Key
+if [ -n "$NEW_RELIC_LICENSE_KEY" ]; then
+    echo "✓ Using NEW_RELIC_LICENSE_KEY from environment"
+    nr_license_key="$NEW_RELIC_LICENSE_KEY"
+else
+    echo "Enter your New Relic License Key:"
+    echo "(Find it at: https://one.newrelic.com/launcher/api-keys-ui.api-keys-launcher)"
+    read -p "License Key: " nr_license_key
+    
+    if [ -z "$nr_license_key" ]; then
+        echo "Error: New Relic License Key cannot be empty"
+        exit 1
+    fi
 fi
 
-# Prompt for OpenAI API Key
-echo ""
-echo "Enter your OpenAI API Key (or GitHub Models token):"
-echo "(For GitHub Models: https://github.com/marketplace/models)"
-read -p "API Key: " openai_api_key
-
-if [ -z "$openai_api_key" ]; then
-    echo "Error: OpenAI API Key cannot be empty"
-    exit 1
+# Check for GitHub Token / OpenAI API Key
+if [ -n "$GITHUB_TOKEN" ]; then
+    echo "✓ Using GITHUB_TOKEN from environment"
+    openai_api_key="$GITHUB_TOKEN"
+else
+    echo ""
+    echo "Enter your OpenAI API Key (or GitHub Models token):"
+    echo "(For GitHub Models: https://github.com/marketplace/models)"
+    read -p "API Key: " openai_api_key
+    
+    if [ -z "$openai_api_key" ]; then
+        echo "Error: OpenAI API Key cannot be empty"
+        exit 1
+    fi
 fi
 
-# Prompt for OpenWeather API Key
+# Prompt for OpenWeather API Key (optional)
 echo ""
-echo "Enter your OpenWeather API Key (optional, press Enter to skip):"
+echo "Enter your OpenWeather API Key (optional - press Enter to skip):"
 echo "(Sign up at: https://home.openweathermap.org/api_keys)"
 read -p "OpenWeather API Key: " openweather_api_key
 
