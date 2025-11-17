@@ -30,8 +30,7 @@ echo "For GitHub Models API access, your token needs:"
 echo "  - No specific scopes required for public models"
 echo "  - 'repo' scope for private repository access (optional)"
 echo ""
-read -sp "GitHub Token: " github_token
-echo ""
+read -p "GitHub Token: " github_token
 
 if [ -z "$github_token" ]; then
     echo "Error: GitHub token cannot be empty"

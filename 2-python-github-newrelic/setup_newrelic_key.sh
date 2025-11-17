@@ -28,8 +28,7 @@ echo "(Find it at: https://one.newrelic.com/launcher/api-keys-ui.api-keys-launch
 echo ""
 echo "Your license key should be a 40-character hexadecimal string"
 echo ""
-read -sp "License Key: " nr_license_key
-echo ""
+read -p "License Key: " nr_license_key
 
 if [ -z "$nr_license_key" ]; then
     echo "Error: New Relic License Key cannot be empty"
