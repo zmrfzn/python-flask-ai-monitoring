@@ -35,16 +35,6 @@ if [ -z "$nr_license_key" ]; then
     exit 1
 fi
 
-# Validate license key format (40 character hex string)
-if [[ ! "$nr_license_key" =~ ^[A-Fa-f0-9]{40}$ ]]; then
-    echo "Warning: License key doesn't match expected format (40 hexadecimal characters)"
-    read -p "Continue anyway? (y/N): " continue_anyway
-    if [[ ! "$continue_anyway" =~ ^[Yy]$ ]]; then
-        echo "Aborted."
-        exit 1
-    fi
-fi
-
 # Determine which shell config file to use
 SHELL_CONFIG=""
 if [ -n "$ZSH_VERSION" ] || [[ "$SHELL" == *"zsh"* ]]; then
