@@ -24,28 +24,61 @@ cp .env.example tools/.env
 Edit each `.env` to add your `OPENAI_API_KEY` (GitHub PAT with models.read). Optional: add `OPENWEATHER_API_KEY` for weather tool.
 
 ### 4. Run Services
-Each component ships with its own `.env` file in the corresponding directory.
-Start every process from that directory so environment variables are picked up:
+
+#### Option A: Quick Start (All Services at Once)
+
+Use the provided shell scripts to start/stop all three services with a single command:
+
+**Start all services:**
+```bash
+./start_all.sh
+```
+
+This will start:
+- Tools server on port 8090
+- Agent server on port 8080
+- Streamlit client on port 8501
+
+All services run in the background with logs saved to the `logs/` directory.
+
+**Stop all services:**
+```bash
+./stop_all.sh
+```
+
+**View logs:**
+```bash
+tail -f logs/tools.log    # Tools server logs
+tail -f logs/agent.log    # Agent server logs
+tail -f logs/client.log   # Streamlit client logs
+```
+
+**Access the services:**
+- Tools Server: http://localhost:8090
+- Agent Server: http://localhost:8080
+- Client UI: http://localhost:8501
+
+#### Option B: Manual Start (Individual Services)
+
+If you prefer to run each service in its own terminal:
 
 Tools MCP server (default port 8090):
-```
+```bash
 cd tools
 uv run python tools_server.py
 ```
 
 FastAPI chat server (default port 8080):
-```
+```bash
 cd server
 uv run python agent.py
 ```
 
 Optional Streamlit client:
-```
+```bash
 cd client
 streamlit run client.py
 ```
-
-There is no consolidated `run-all` helper; launch each service in its own terminal.
 
 ### 5. Test Endpoint
 ```

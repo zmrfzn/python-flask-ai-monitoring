@@ -1,0 +1,30 @@
+This is just a sample. A real example would be much longer.
+
+Lew Cirne founded New Relic in 2008 and became the company's CEO.[4] The name "New Relic" is an anagram of founder Lew Cirne's name.[5]
+
+On November 5, 2012, CA Technologies filed a lawsuit claiming that New Relic violated three patents that came into CA Technologies' possession through the acquisition of Wily Technology (a company also founded by Lew Cirne).[6]
+
+In February 2013, New Relic raised $80 million from investors including Insight Venture Partners, T. Rowe Price, Benchmark Capital, Allen & Company, Trinity Ventures, Passport Capital, Dragoneer, and Tenaya Capital at a valuation of $750 million.[7][8] The funding round helped New Relic extend its software analytics platform to include Android and iOS native mobile apps.[9][7] In October 2013, the company announced that it was converting its software analytics product into a SaaS model, code named Rubicon.[10]
+
+In April 2014, New Relic raised another $100 million in funding led by BlackRock, Inc., and Passport Capital, with participation from T. Rowe Price Associates, Inc. and Wellington Management.[11][12] The company went public on December 12, 2014.[13]
+
+2020 to present
+In January 2020, the company announced that Bill Staples was joining the company as Chief Product Officer.[14] In June, amid internal disagreements about how the company should respond to systemic racism in society, former CEO Lew Cirne sent a memo stating that Black Lives Matter discussions were "off-the-table".[15]
+
+In July 2020, New Relic announced a new platform called New Relic One.[16] In October, Cirne made donations to an anti-gay Christian school and an anti-Jewish evangelist, leading to some employees being uncomfortable and offended.[17] In December, the company acquired Pixie Labs, a service for monitoring cloud-native workloads running on Kubernetes clusters.[18]
+
+In May 2021, Bill Staples was promoted to CEO, and Cirne transitioned to executive chairman.[4] In June, the company acquired CodeStream, a developer collaboration tool.[19][20][21]
+
+In February 2022, the company released infrastructure monitoring software to help DevOps, site reliability engineering (SRE) and ITOps teams monitor issues across public, private and hybrid cloud environments.[16] In May, the company launched a vulnerability management tool for security, DevOps, security operations (SecOps) and SRE teams.[22]
+
+In June 2023, following a $55 million operational loss in the preceding fiscal year, New Relic laid off 155 employees in the US and up to 57 abroad.[23] In July 2023, the company agreed to be acquired by private equity firms Francisco Partners and TPG Inc. in an all-cash deal valued at $6.5 billion.[24] The acquisition was finalized in November and New Relic was delisted from the New York Stock Exchange.
+
+In December 2023, the company announced Ashan Willy, former CEO of Proofpoint, Inc., as its new CEO.[1][25]
+
+In May 2025, New Relic integrated with GitHub Copilot's agentic coding capability to detect performance issues in generated code.[26] In October, the company appointed Brian Emerson as its new CPO.[27]
+
+Products
+New Relic's technology, delivered in a software as a service (SaaS) model, monitors Web and mobile applications in real-time[28][29][9][30] and supports custom-built plugins to collect arbitrary data.[31]
+
+Operations
+The company partners with companies including IBM Bluemix, Amazon Web Services, CloudBees, Engine Yard, Heroku, Joyent, Rackspace Hosting, and Microsoft Azure as well as mobile application backend service providers Appcelerator, Parse, and StackMob.[30][32][33][34]

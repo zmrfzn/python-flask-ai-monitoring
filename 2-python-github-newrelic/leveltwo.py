@@ -1,16 +1,39 @@
 # import the New Relic Python Agent
 import newrelic.agent
 import os
+import sys
 from openai import OpenAI
 from flask import Flask, render_template, request
 import markdown
+
+# Validate required environment variables before starting the application
+required_env_vars = {
+    "GITHUB_TOKEN": "GitHub API token for model access",
+    "NEW_RELIC_LICENSE_KEY": "New Relic license key for monitoring"
+}
+
+missing_vars = []
+for var, description in required_env_vars.items():
+    if not os.environ.get(var):
+        missing_vars.append(f"  - {var}: {description}")
+
+if missing_vars:
+    print("ERROR: Missing required environment variables:")
+    print("\n".join(missing_vars))
+    print("\nPlease set these environment variables before running the application.")
+    print("Example:")
+    print("  export GITHUB_TOKEN='your_token_here'")
+    print("  export NEW_RELIC_LICENSE_KEY='your_license_key_here'")
+    sys.exit(1)
+
+# Set MODEL with default value
+model_id = os.environ.get("MODEL", "gpt-4o-mini")
+print(f"Using model: {model_id}")
 
 client = OpenAI(
     base_url="https://models.inference.ai.azure.com",
     api_key=os.environ["GITHUB_TOKEN"],
 )
-
-model_id = os.environ["MODEL"]  # e.g. "gpt-4o-mini"
 
 app = Flask(__name__, template_folder="../templates",
             static_folder="../static")

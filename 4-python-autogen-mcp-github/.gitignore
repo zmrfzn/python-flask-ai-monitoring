@@ -163,3 +163,5 @@ cython_debug/
 
 .venv/
 .vscode/
+*.pid
+uv.lock
